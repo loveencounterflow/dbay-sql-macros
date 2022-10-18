@@ -19,17 +19,29 @@ GUY                       = require 'guy'
   log     }               = GUY.trm
 #...........................................................................................................
 types                     = new ( require 'intertype' ).Intertype
+{ equals }                = types
 new_xregex                = require 'xregexp'
 # E                         = require '../../../apps/dbay/lib/errors'
 sql_lexer                 = require 'dbay-sql-lexer'
 
-E = {}
+
+#-----------------------------------------------------------------------------------------------------------
+#
+#===========================================================================================================
+class DBay_sqlm_error extends Error
+  constructor: ( ref, message ) ->
+    super()
+    @message  = "#{ref} (#{@constructor.name}) #{message}"
+    @ref      = ref
+    return undefined ### always return `undefined` from constructor ###
 
 #===========================================================================================================
-class E.DBay_sqlx_error            extends E.DBay_error
+class DBay_sqlm_TOBESPECIFIED_error            extends DBay_sqlm_error
   constructor: ( ref, message )     -> super ref, message
 
 
+#-----------------------------------------------------------------------------------------------------------
+#
 #===========================================================================================================
 class DBay_sqlx # extends ( require H.dbay_path ).DBay
 
@@ -43,25 +55,25 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
 
   #---------------------------------------------------------------------------------------------------------
   declare: ( sqlx ) ->
-    @types.validate.nonempty_text sqlx
+    @types.validate.nonempty.text sqlx
     parameters_re           = null
     #.......................................................................................................
     name_re                 = /^(?<name>@[^\s^(]+)/y
     unless ( match = sqlx.match name_re )?
-      throw new E.DBay_sqlx_error '^dbay/sqlx@1^', "syntax error in #{rpr sqlx}"
+      throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@1^', "syntax error in #{rpr sqlx}"
     { name, }               = match.groups
     #.......................................................................................................
     if sqlx[ name_re.lastIndex ] is '('
       parameters_re           = /\(\s*(?<parameters>[^)]*?)\s*\)\s*=\s*/y
       parameters_re.lastIndex = name_re.lastIndex
       unless ( match = sqlx.match parameters_re )?
-        throw new E.DBay_sqlx_error '^dbay/sqlx@2^', "syntax error in #{rpr sqlx}"
+        throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@2^', "syntax error in #{rpr sqlx}"
       { parameters, }         = match.groups
       parameters              = parameters.split /\s*,\s*/
       parameters              = [] if equals parameters, [ '', ]
     else
       ### extension for declaration, call w/out parentheses left for later ###
-      # throw new E.DBay_sqlx_error '^dbay/sqlx@3^', "syntax error: parentheses are obligatory but missing in #{rpr sqlx}"
+      # throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@3^', "syntax error: parentheses are obligatory but missing in #{rpr sqlx}"
       parameters              = []
     #.......................................................................................................
     current_idx                 = parameters_re?.lastIndex ? name_re.lastIndex
@@ -91,14 +103,14 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
   #---------------------------------------------------------------------------------------------------------
   _sqlx_declare: ( cfg ) ->
     if @_sqlx_declarations[ cfg.name ]?
-      throw new E.DBay_sqlx_error '^dbay/sqlx@2^', "can not re-declare #{rpr cfg.name}"
+      throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@2^', "can not re-declare #{rpr cfg.name}"
     @_sqlx_cmd_re                   = null
     @_sqlx_declarations[ cfg.name ] = cfg
     return null
 
   #---------------------------------------------------------------------------------------------------------
   resolve: ( sqlx ) ->
-    @types.validate.nonempty_text sqlx
+    @types.validate.nonempty.text sqlx
     sql_before  = sqlx
     count       = 0
     #.......................................................................................................
@@ -111,7 +123,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
         #...................................................................................................
         unless ( declaration = @_sqlx_declarations[ name ] )?
           ### NOTE should never happen as we always re-compile pattern from declaration keys ###
-          throw new E.DBay_sqlx_error '^dbay/sqlx@4^', "unknown name #{rpr name}"
+          throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@4^', "unknown name #{rpr name}"
         #...................................................................................................
         if tail.startsWith '('
           matches     = new_xregex.matchRecursive tail, '\\(', '\\)', '', \
@@ -126,7 +138,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
           call_arity  = 0
         #...................................................................................................
         unless call_arity is declaration.arity
-          throw new E.DBay_sqlx_error '^dbay/sqlx@5^', "expected #{declaration.arity} argument(s), got #{call_arity}"
+          throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@5^', "expected #{declaration.arity} argument(s), got #{call_arity}"
         #...................................................................................................
         R = declaration.body
         for parameter, idx in declaration.parameters
@@ -387,3 +399,4 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
   done?()
 
 
+module.exports = { DBay_sqlx, DBay_sqlm_error, DBay_sqlm_TOBESPECIFIED_error, }
