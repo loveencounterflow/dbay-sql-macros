@@ -92,13 +92,8 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       return +1 if a > b
       return -1 if a < b
       return 0
-    names = ( @_escape_literal_for_regex name for name in names ).join '|'
+    names = ( GUY.str.escape_for_regex name for name in names ).join '|'
     return @_sqlx_cmd_re = /// (?<= \W | ^ ) (?<name> #{names} ) (?= \W | $ ) (?<tail> .* ) $ ///g
-
-  #---------------------------------------------------------------------------------------------------------
-  ### thx to https://stackoverflow.com/a/6969486/7568091 and
-  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#escaping ###
-  _escape_literal_for_regex: ( literal ) -> literal.replace /[.*+?^${}()|[\]\\]/g, '\\$&'
 
   #---------------------------------------------------------------------------------------------------------
   _declare: ( cfg ) ->
