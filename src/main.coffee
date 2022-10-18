@@ -79,12 +79,12 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
     current_idx                 = parameters_re?.lastIndex ? name_re.lastIndex
     body                        = sqlx[ current_idx ... ].replace /\s*;\s*$/, ''
     arity                       = parameters.length
-    @_sqlx_declare { name, parameters, arity, body, }
+    @_declare { name, parameters, arity, body, }
   #.......................................................................................................
     return null
 
   #---------------------------------------------------------------------------------------------------------
-  _sqlx_get_cmd_re: ->
+  _get_cmd_re: ->
     return R if ( R = @_sqlx_cmd_re )?
     names = ( Object.keys @_sqlx_declarations ).sort ( a, b ) ->
       a = ( Array.from a ).length
@@ -101,7 +101,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
   _escape_literal_for_regex: ( literal ) -> literal.replace /[.*+?^${}()|[\]\\]/g, '\\$&'
 
   #---------------------------------------------------------------------------------------------------------
-  _sqlx_declare: ( cfg ) ->
+  _declare: ( cfg ) ->
     if @_sqlx_declarations[ cfg.name ]?
       throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@2^', "can not re-declare #{rpr cfg.name}"
     @_sqlx_cmd_re                   = null
