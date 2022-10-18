@@ -54,7 +54,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
     return undefined
 
   #---------------------------------------------------------------------------------------------------------
-  declare: ( sqlx ) ->
+  declare: ( sqlx ) =>
     @types.validate.nonempty.text sqlx
     parameters_re           = null
     #.......................................................................................................
@@ -104,14 +104,14 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
     return null
 
   #---------------------------------------------------------------------------------------------------------
-  resolve: ( sqlx ) ->
+  resolve: ( sqlx ) =>
     @types.validate.nonempty.text sqlx
     sql_before  = sqlx
     count       = 0
     #.......................................................................................................
     loop
       break if count++ > 10_000 ### NOTE to avoid deadlock, just in case ###
-      sql_after = sql_before.replace @_sqlx_get_cmd_re(), ( _matches..., idx, _sqlx, groups ) =>
+      sql_after = sql_before.replace @_get_cmd_re(), ( _matches..., idx, _sqlx, groups ) =>
         # debug '^546^', rpr sqlx[ idx ... idx + groups.name.length ]
         { name
           tail  } = groups
