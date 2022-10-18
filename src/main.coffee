@@ -46,7 +46,7 @@ class DBay_sqlm_TOBESPECIFIED_error            extends DBay_sqlm_error
 class DBay_sqlx # extends ( require H.dbay_path ).DBay
 
   #---------------------------------------------------------------------------------------------------------
-  constructor: ( P... ) ->
+  constructor: ->
     # super P...
     GUY.props.hide @, '_sqlx_declarations', {}
     GUY.props.hide @, '_sqlx_cmd_re',       null
