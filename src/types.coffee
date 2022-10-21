@@ -23,5 +23,5 @@ declare.dbm_constructor_cfg
   fields:
     name_re:      'text.or.regex'
   default:
-    name_re:      /^(?<name>@\p{Letter}+)/yu
+    name_re:      /^(?<name>@[\p{Letter}_][\p{Letter}_\d]*)/yu
 
