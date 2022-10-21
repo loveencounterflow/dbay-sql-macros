@@ -21,7 +21,8 @@ module.exports            = types = new ( require 'intertype' ).Intertype()
 declare.dbm_constructor_cfg
   ### TAINT use `create()` to convert, checks flags of `name_re` ###
   fields:
-    name_re:      'text.or.regex'
+    # name_re:      'text.or.regex'
+    name_re:      'regex'
   default:
     name_re:      /^(?<name>@[\p{Letter}_][\p{Letter}_\d]*)/yu
 
