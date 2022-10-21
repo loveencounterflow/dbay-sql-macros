@@ -18,8 +18,7 @@ GUY                       = require 'guy'
   echo
   log     }               = GUY.trm
 #...........................................................................................................
-types                     = new ( require 'intertype' ).Intertype
-{ equals }                = types
+{ equals }                = GUY.samesame
 new_xregex                = require 'xregexp'
 # E                         = require '../../../apps/dbay/lib/errors'
 sql_lexer                 = require 'dbay-sql-lexer'
