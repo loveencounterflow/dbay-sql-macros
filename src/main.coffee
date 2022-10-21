@@ -46,10 +46,11 @@ class DBay_sqlm_TOBESPECIFIED_error            extends DBay_sqlm_error
 class DBay_sqlx # extends ( require H.dbay_path ).DBay
 
   #---------------------------------------------------------------------------------------------------------
-  constructor: ->
+  constructor: ( cfg ) ->
     GUY.props.hide @, 'types',          require './types'
     GUY.props.hide @, '_declarations',  {}
     GUY.props.hide @, '_cmd_re',        null
+    @cfg = @types.create.dbm_constructor_cfg cfg
     return undefined
 
   #---------------------------------------------------------------------------------------------------------
