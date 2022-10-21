@@ -57,27 +57,27 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
   declare: ( sqlx ) =>
     @types.validate.nonempty.text sqlx
     parameters_re           = null
+    @cfg.name_re.lastIndex  = 0
     #.......................................................................................................
-    name_re                 = /^(?<name>@[^\s^(]+)/y
-    unless ( match = sqlx.match name_re )?
+    unless ( match = sqlx.match @cfg.name_re )?
       throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@1^', "syntax error in #{rpr sqlx}"
     { name, }               = match.groups
     #.......................................................................................................
-    if sqlx[ name_re.lastIndex ] is '('
-      parameters_re           = /\(\s*(?<parameters>[^)]*?)\s*\)\s*=\s*/y
-      parameters_re.lastIndex = name_re.lastIndex
+    if sqlx[ @cfg.name_re.lastIndex ] is '('
+      parameters_re           = /\(\s*(?<parameters>[^)]*?)\s*\)\s*=\s*/yu
+      parameters_re.lastIndex = @cfg.name_re.lastIndex
       unless ( match = sqlx.match parameters_re )?
         throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@2^', "syntax error in #{rpr sqlx}"
       { parameters, }         = match.groups
-      parameters              = parameters.split /\s*,\s*/
+      parameters              = parameters.split /\s*,\s*/u
       parameters              = [] if equals parameters, [ '', ]
     else
       ### extension for declaration, call w/out parentheses left for later ###
       # throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@3^', "syntax error: parentheses are obligatory but missing in #{rpr sqlx}"
       parameters              = []
     #.......................................................................................................
-    current_idx                 = parameters_re?.lastIndex ? name_re.lastIndex
-    body                        = sqlx[ current_idx ... ].replace /\s*;\s*$/, ''
+    current_idx                 = parameters_re?.lastIndex ? @cfg.name_re.lastIndex
+    body                        = sqlx[ current_idx ... ].replace /\s*;\s*$/u, ''
     arity                       = parameters.length
     @_declare { name, parameters, arity, body, }
   #.......................................................................................................
@@ -93,11 +93,11 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       return -1 if a < b
       return 0
     names = ( GUY.str.escape_for_regex name for name in names ).join '|'
-    return @_sqlx_cmd_re = /// (?<= \W | ^ ) (?<name> #{names} ) (?= \W | $ ) (?<tail> .* ) $ ///g
+    return @_cmd_re = /// (?<= \W | ^ ) (?<name> #{names} ) (?= \W | $ ) (?<tail> .* ) $ ///gu
 
   #---------------------------------------------------------------------------------------------------------
   _declare: ( cfg ) ->
-    if @_sqlx_declarations[ cfg.name ]?
+    if @_declarations[ cfg.name ]?
       throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@2^', "can not re-declare #{rpr cfg.name}"
     @_cmd_re                   = null
     @_declarations[ cfg.name ] = cfg
@@ -138,7 +138,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
         R = declaration.body
         for parameter, idx in declaration.parameters
           value = values[ idx ]
-          R = R.replace ///#{parameter}///g, value
+          R = R.replace ///#{parameter}\b///gu, value
         return R + tail
       break if sql_after is sql_before
       sql_before = sql_after
