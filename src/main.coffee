@@ -47,10 +47,9 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
 
   #---------------------------------------------------------------------------------------------------------
   constructor: ->
-    # super P...
-    GUY.props.hide @, '_sqlx_declarations', {}
-    GUY.props.hide @, '_sqlx_cmd_re',       null
-    GUY.props.hide @, 'types',              types
+    GUY.props.hide @, 'types',          require './types'
+    GUY.props.hide @, '_declarations',  {}
+    GUY.props.hide @, '_cmd_re',        null
     return undefined
 
   #---------------------------------------------------------------------------------------------------------
@@ -85,8 +84,8 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
 
   #---------------------------------------------------------------------------------------------------------
   _get_cmd_re: ->
-    return R if ( R = @_sqlx_cmd_re )?
-    names = ( Object.keys @_sqlx_declarations ).sort ( a, b ) ->
+    return R if ( R = @_cmd_re )?
+    names = ( Object.keys @_declarations ).sort ( a, b ) ->
       a = ( Array.from a ).length
       b = ( Array.from b ).length
       return +1 if a > b
@@ -99,8 +98,8 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
   _declare: ( cfg ) ->
     if @_sqlx_declarations[ cfg.name ]?
       throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@2^', "can not re-declare #{rpr cfg.name}"
-    @_sqlx_cmd_re                   = null
-    @_sqlx_declarations[ cfg.name ] = cfg
+    @_cmd_re                   = null
+    @_declarations[ cfg.name ] = cfg
     return null
 
   #---------------------------------------------------------------------------------------------------------
@@ -116,7 +115,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
         { name
           tail  } = groups
         #...................................................................................................
-        unless ( declaration = @_sqlx_declarations[ name ] )?
+        unless ( declaration = @_declarations[ name ] )?
           ### NOTE should never happen as we always re-compile pattern from declaration keys ###
           throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@4^', "unknown name #{rpr name}"
         #...................................................................................................
