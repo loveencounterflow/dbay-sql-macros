@@ -85,7 +85,8 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
   #---------------------------------------------------------------------------------------------------------
   _get_cmd_re: ->
     return R if ( R = @_cmd_re )?
-    names = ( Object.keys @_declarations ).sort ( a, b ) ->
+    return /[]/gu if ( names = Object.keys @_declarations ).length is 0
+    names = names.sort ( a, b ) ->
       a = ( Array.from a ).length
       b = ( Array.from b ).length
       return +1 if a > b
