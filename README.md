@@ -7,6 +7,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [𓆤DBay SQL Macros](#%F0%93%86%A4dbay-sql-macros)
+  - [Use Case for Macros: Virtual Types](#use-case-for-macros-virtual-types)
 - [To Do](#to-do)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -37,6 +38,7 @@ Instances of `dbay-sql-macros` <!-- ### TAINT use class name --> hav two public 
 m                 = new DBay_sqlx()
 m.declare "@secret_power( @a, @b ) = power( @a, @b ) / @b;"
 result  = m.resolve "select @secret_power( 3, 2 ) as p;"
+# "select power( 3, 2 ) / 2 as p;"
 ```
 
 In the above, we have declared a function-like macro named `@secret_power()` that accepts two arguments,
@@ -58,6 +60,9 @@ Notes:
 
 * The use of the `@` (at-sign) in the above is purely a convention to avoid name clashes with existing
   SQLite keywords and identifiers (`@` is not allowed by SQLite in identifiers, so should be safe).
+* One can pass a regular expression to setting `name_re` on instantiation; the default is to use `m = new
+  DBay_sqlx { name_re: /^(?<name>@[\p{Letter}_][\p{Letter}_\d]*)/yu, }` which mandates the use of `@` as a
+  prefix followed by a name made up from letters, digits, and underscores.
 * The exact syntax for macro declarations is still under consideration and may change.
 * In particular, one wants to allow multiple statements to appear in macros.
 * As it stands, everything to the right hand side of the equals sign minus any trailing semicolon becomes
@@ -87,11 +92,39 @@ do ->
   matcher = 'select ( ( ( 1 + 2 ) * 3 ) + ( 4 + ( 5 * 6 ) ) ) as p;'
 ```
 
+## Use Case for Macros: Virtual Types
+
+```sql
+create table t (
+  year        integer check ( year    between 1900  and 2100 ),
+  month       integer check ( month   between 1     and 12   ),
+  day         integer check ( day     between 1     and 31   ),
+  hour        integer check ( hour    between 0     and 23   ),
+  minute      integer check ( minute  between 0     and 59   ),
+  second      integer check ( second  between 0     and 59   )
+  );
+```
+
+```sql
+  month_name  text    check ( month_name in ( 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec', ) ),
+```
 
 # To Do
 
 * **[–]** documentation
 * **[–]** safeguard against using a macro in its own expansion, leads to infinite regress
+* **[–]** allow parameters in parentheses to trigger expansions with parentheses, ex.:
+
+  ```coffee
+  declare SQL"""@foo( (@first), @second ) = @first * @second;"""
+  resolve SQL"""@foo( 1 + 2, 3 );"""
+  # gives
+  '( 1+2 ) * 3'
+  ```
+
+  Likewise, could allow SQL"""@foo = (( @a, @b ))""" to put parentheses around entire replacement
+
+* **[–]** after expansions are done, check whether `cfg.name_re` matches any remaining parts
 
 <!--
 ## Is Done
