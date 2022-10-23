@@ -146,11 +146,15 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       sql_before = sql_after
     #.......................................................................................................
     if ( macro_names = @_find_all_macro_names sql_after ).length isnt 0
-      macro_names = macro_names.sort()
-      macro_names = ( n for n, idx in macro_names when n isnt macro_names[ idx + 1 ] )
-      macro_names = macro_names.join ', '
+      macro_names = @_sorted_unique_names_as_text macro_names
       throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@5^', "found unresolved macros #{macro_names}"
     return sql_after
+
+  #---------------------------------------------------------------------------------------------------------
+  _sorted_unique_names_as_text: ( names ) ->
+    R = names.sort()
+    R = ( name for name, idx in R when name isnt R[ idx + 1 ] )
+    return R.join ', '
 
   #---------------------------------------------------------------------------------------------------------
   _find_arguments: ( sqlx ) ->
