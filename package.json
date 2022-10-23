@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "dbay-sql-lexer": "^1.0.0",
-    "guy": "11.12.0",
+    "guy": "11.13.0",
     "intertype": "0.105.0",
     "xregexp": "^5.1.1"
   }
