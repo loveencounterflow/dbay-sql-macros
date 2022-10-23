@@ -96,7 +96,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       return -1 if a < b
       return 0
     names = ( GUY.str.escape_for_regex name for name in names ).join '|'
-    return @_cmd_re = /// (?<= \W | ^ ) (?<name> #{names} ) (?= \W | $ ) (?<tail> .* ) $ ///gu
+    return @_cmd_re = /// (?<= \W | ^ ) (?<name> #{names} ) (?= \W | $ ) (?<tail> .* ) $ ///gsu
 
   #---------------------------------------------------------------------------------------------------------
   _declare: ( cfg ) ->
