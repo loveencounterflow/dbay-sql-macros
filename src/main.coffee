@@ -83,6 +83,9 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
     return null
 
   #---------------------------------------------------------------------------------------------------------
+  _find_all_macro_names: ( sqlx ) -> ( match[ 0 ] for match from sqlx.matchAll @cfg._global_name_re )
+
+  #---------------------------------------------------------------------------------------------------------
   _get_cmd_re: ->
     return R if ( R = @_cmd_re )?
     return /^[]/sgu if ( names = Object.keys @_declarations ).length is 0
@@ -143,6 +146,11 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       break if sql_after is sql_before
       sql_before = sql_after
     #.......................................................................................................
+    if ( macro_names = @_find_all_macro_names sql_after ).length isnt 0
+      macro_names = macro_names.sort()
+      macro_names = ( n for n, idx in macro_names when n isnt macro_names[ idx + 1 ] )
+      macro_names = macro_names.join ', '
+      throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@5^', "found unresolved macros #{macro_names}"
     return sql_after
 
   #---------------------------------------------------------------------------------------------------------
