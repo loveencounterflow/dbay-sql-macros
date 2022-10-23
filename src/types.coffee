@@ -21,6 +21,7 @@ module.exports            = types = new ( require 'intertype' ).Intertype()
 declare.dbm_global_regex ( x ) ->
   return false unless @isa.regex x
   return false unless x.global
+  return false if x.sticky
   return true
 
 #-----------------------------------------------------------------------------------------------------------
