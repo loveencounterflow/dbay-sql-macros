@@ -9,6 +9,7 @@
 - [𓆤DBay SQL Macros](#%F0%93%86%A4dbay-sql-macros)
   - [Use Case for Macros: Virtual Types](#use-case-for-macros-virtual-types)
 - [To Do](#to-do)
+  - [Is Done](#is-done)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -124,10 +125,13 @@ create table t (
 
   Likewise, could allow SQL"""@foo = (( @a, @b ))""" to put parentheses around entire replacement
 
-* **[–]** after expansions are done, check whether `cfg.name_re` matches any remaining parts
+* **[–]** should we use a more SQL-ish syntax similar to function declarations like `create macro @m as
+  [begin] ... [end];`?
 
-<!--
+
 ## Is Done
 
+* **[+]** after expansions are done, check whether `cfg.name_re` matches any remaining parts
 * **[+]** use `u`nicode flag on all regexes
- -->
+
+
