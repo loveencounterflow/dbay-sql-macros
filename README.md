@@ -127,6 +127,7 @@ create table t (
 
 * **[–]** should we use a more SQL-ish syntax similar to function declarations like `create macro @m as
   [begin] ... [end];`?
+* **[–]** should macros be undone when declared inside a failed transaction?
 
 
 ## Is Done
