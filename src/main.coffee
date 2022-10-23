@@ -115,7 +115,6 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
     loop
       break if count++ > 10_000 ### NOTE to avoid deadlock, just in case ###
       sql_after = sql_before.replace @_get_cmd_re(), ( _matches..., idx, _sqlx, groups ) =>
-        # debug '^546^', rpr sqlx[ idx ... idx + groups.name.length ]
         { name
           tail  } = groups
         #...................................................................................................
