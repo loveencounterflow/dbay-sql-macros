@@ -80,8 +80,13 @@ Notes:
   supported.
 * It is not allowed to declare or use macros without the parentheses as they are needed to distinguish macro
   names from parameter names.
-* Macros are resolved recursively in way that allows to use macros in macro bodies and macro calls. However,
-  a macro can not contain its own name directly or indirectly as that would cause infinite regression.
+* Macros are resolved recursively in a way that allows to use macros in macro bodies and macro calls.
+  However, a macro can not contain its own name directly or indirectly as that would cause infinite
+  regression.
+* The characters that appear in a call in the space of a declared parameter are used verbatim to replace any
+  appearance of that parameter's name in the macro body, even when they should appear inside of, say, string
+  literals. To block replacements, prefix the parameter name in the macro body with a backslash. These
+  backslashes will be removed from the result.
 
 ```
 m.declare SQL"""@add( @a, @b ) = ( @a + @b );"""
