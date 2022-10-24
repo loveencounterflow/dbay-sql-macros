@@ -69,8 +69,7 @@ Notes:
 * As it stands, everything to the right hand side of the equals sign minus any trailing semicolon becomes
   part of the body.
 * The underlying SQLite DB never gets to see the declarations, only the resolved SQL.
-* Therefore, the DB file remains valid for sufficiently compatible software like the SQLite Command Line
-  Tool.
+* Therefore, the DB file remains valid for external programs like the SQLite Command Line Tool.
 * Some effort has been put into parsing parameters and arguments and parentheses pairs. As a happy result,
   it is possible to put unpaired parentheses into string literals without confusing the mechanism, and to
   nest function and macro calls, so this is legal and will resolve correctly: `select @secret_power( foo( x
@@ -79,10 +78,10 @@ Notes:
   hiccups can not be ruled out.
 * Parameters and arguments must always match in length. Only macros with constant arities are currently
   supported.
-* It is possible to declare and use macros without the parentheses.
-* A macro that has been declared with empty parentheses may be called with empty or without parentheses, and
-  vice versa.
-* Macros are resolved recursively in way that allows to use macros in macro bodies and macro calls.
+* It is not allowed to declare or use macros without the parentheses as they are needed to distinguish macro
+  names from parameter names.
+* Macros are resolved recursively in way that allows to use macros in macro bodies and macro calls. However,
+  a macro can not contain its own name directly or indirectly as that would cause infinite regression.
 
 ```
 m.declare SQL"""@add( @a, @b ) = ( @a + @b );"""
@@ -125,6 +124,11 @@ create table t (
 
   Likewise, could allow SQL"""@foo = (( @a, @b ))""" to put parentheses around entire replacement
 
+* **[–]** do not allow macro calls without parentheses because only then can we distinguish between macro
+  names and parameter names
+* **[–]** sort macro names by length *and* lexicographically to avoid order of declaration having any kind
+  of effect
+* **[–]** should really search through source to find macro calls, not use regex built from macro names
 * **[–]** should we use a more SQL-ish syntax similar to function declarations like `create macro @m as
   [begin] ... [end];`?
 * **[–]** should macros be undone when declared inside a failed transaction?
