@@ -124,13 +124,16 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       { body }        = declaration
       for parameter_re, parameter_idx in declaration.parameter_res
         ### TAINT must use lexer to make replacements ###
-        body = body.replace parameter_re, values[ parameter_idx ]
+        debug '^56-1^', rpr values[ parameter_idx ]
+        debug '^56-1^', rpr @resolve values[ parameter_idx ]
+        body = body.replace parameter_re, @resolve values[ parameter_idx ]
+        # body = body.replace parameter_re, values[ parameter_idx ]
       #.....................................................................................................
       ### TAINT ^hardwired-sigil^ this hardwires `@` as sigil ###
       body = body.replace /\\@/gu, '@'
       R.push body
       R.push tail[ stop_idx .. ]
-    return R.join ''
+    return if R.length is 0 then sqlx else R.join ''
 
   #---------------------------------------------------------------------------------------------------------
   _find_arguments: ( sqlx ) ->
