@@ -4,32 +4,17 @@ specifiers:
   dbay-sql-lexer: ^1.0.0
   guy: 11.13.0
   intertype: 0.105.0
-  xregexp: ^5.1.1
 
 dependencies:
   dbay-sql-lexer: 1.0.0
   guy: 11.13.0
   intertype: 0.105.0
-  xregexp: 5.1.1
 
 packages:
-
-  /@babel/runtime-corejs3/7.19.4:
-    resolution: {integrity: sha512-HzjQ8+dzdx7dmZy4DQ8KV8aHi/74AjEbBGTFutBmg/pd3dY5/q1sfuOGPTFGEytlQhWoeVXqcK5BwMgIkRkNDQ==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      core-js-pure: 3.25.5
-      regenerator-runtime: 0.13.10
-    dev: false
 
   /ansi-regex/5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
     engines: {node: '>=8'}
-    dev: false
-
-  /core-js-pure/3.25.5:
-    resolution: {integrity: sha512-oml3M22pHM+igfWHDfdLVq2ShWmjM2V4L+dQEBs0DWVIqEm9WHCwGAlZ6BmyBQGy5sFrJmcx+856D9lVKyGWYg==}
-    requiresBuild: true
     dev: false
 
   /dbay-sql-lexer/1.0.0:
@@ -121,10 +106,6 @@ packages:
     resolution: {integrity: sha512-N9cdGSDDD7kxOV7R6e4iZqsHTZ4F4iiSDWqMcVqx4gEH6HBtRXav39Gj3fgT1YqvBcwPCQuf0Oa5R2cDaLWK8A==}
     dev: false
 
-  /regenerator-runtime/0.13.10:
-    resolution: {integrity: sha512-KepLsg4dU12hryUO7bp/axHAKvwGOCV0sGloQtpagJ12ai+ojVDqkeGSiRX1zlq+kjIMZ1t7gpze+26QqtdGqw==}
-    dev: false
-
   /rfdc/1.3.0:
     resolution: {integrity: sha512-V2hovdzFbOi77/WajaSMXk2OLm+xNIeQdMMuB7icj7bk6zi2F8GGAxigcnDFpJHbNyNcgyJDiP+8nOrY5cZGrA==}
     dev: false
@@ -165,10 +146,4 @@ packages:
     dependencies:
       varsize-string: 2.2.2
       wcsize: 1.0.0
-    dev: false
-
-  /xregexp/5.1.1:
-    resolution: {integrity: sha512-fKXeVorD+CzWvFs7VBuKTYIW63YD1e1osxwQ8caZ6o1jg6pDAbABDG54LCIq0j5cy7PjRvGIq6sef9DYPXpncg==}
-    dependencies:
-      '@babel/runtime-corejs3': 7.19.4
     dev: false
