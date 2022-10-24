@@ -87,9 +87,14 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
   _declare: ( cfg ) ->
     if @_declarations[ cfg.name ]?
       throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@2^', "can not re-declare #{rpr cfg.name}"
-    cfg.parameter_res           = ( GUY.str.escape_for_regex p for p in cfg.parameters )
+    cfg.parameter_res           = ( @_get_parameter_re p for p in cfg.parameters )
     @_declarations[ cfg.name ]  = cfg
     return null
+
+  #---------------------------------------------------------------------------------------------------------
+  ### TAINT see https://shiba1014.medium.com/regex-word-boundaries-with-unicode-207794f6e7ed
+  for Unicode-compliant alternatives to the trailing `\b`; OTOH we're dealing w/ mostly-ASCII SQL here ###
+  _get_parameter_re: ( parameter ) -> /// (?<! \\ ) #{GUY.str.escape_for_regex parameter} \b ///gu
 
   #---------------------------------------------------------------------------------------------------------
   resolve: ( sqlx ) =>
@@ -117,10 +122,12 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       #.....................................................................................................
       ### NOTE recursion must happen here ###
       { body }        = declaration
-      for parameter, parameter_idx in declaration.parameters
+      for parameter_re, parameter_idx in declaration.parameter_res
         ### TAINT must use lexer to make replacements ###
-        body = body.replace ///#{parameter}\b///gu, values[ parameter_idx ]
+        body = body.replace parameter_re, values[ parameter_idx ]
       #.....................................................................................................
+      ### TAINT ^hardwired-sigil^ this hardwires `@` as sigil ###
+      body = body.replace /\\@/gu, '@'
       R.push body
       R.push tail[ stop_idx .. ]
     return R.join ''

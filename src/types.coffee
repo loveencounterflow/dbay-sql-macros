@@ -51,6 +51,8 @@ declare.dbm_constructor_cfg
     _global_name_re:  'regex'
     # brackets:         'dbm_brackets'
   default:
+    ### TAINT see TAINT ^hardwired-sigil^ in main.coffee ###
+    ### TAINT should accept sigil, name_re as distinct `cfg` settings ###
     name_re:          /@[\p{Letter}_][\p{Letter}_\d]*/yu
     # brackets:         [ '(', ')', ]
   create: ( cfg ) ->
