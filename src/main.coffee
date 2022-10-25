@@ -39,6 +39,12 @@ class DBay_sqlm_internal_error            extends DBay_sqlm_error
   constructor: ( ref, message )     -> super ref, message
 class DBay_sqlm_unknown_macro_error       extends DBay_sqlm_error
   constructor: ( ref, name )        -> super ref, "unknown macro #{rpr name}"
+class DBay_sqlm_arity_error               extends DBay_sqlm_error
+  constructor: ( ref, name, declaration_arity, call_arity, source, values ) ->
+    super ref, """
+      expected #{declaration_arity} arguments in call to macro #{rpr name}, got #{call_arity};
+      source: #{rpr source},
+      values: #{rpr values}"""
 class DBay_sqlm_TOBESPECIFIED_error       extends DBay_sqlm_error
   constructor: ( ref, message )     -> super ref, message
 
@@ -125,7 +131,8 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       call_arity      = values.length
       #.....................................................................................................
       unless call_arity is declaration.arity
-        throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/dbm@6^', "expected #{declaration.arity} argument(s), got #{call_arity}"
+        source = sqlx[ match.index ... position + stop_idx ]
+        throw new DBay_sqlm_arity_error '^dbay/dbm@6^', name, declaration.arity, call_arity, source, values
       #.....................................................................................................
       # help '^56-2^', ( rpr tail ), '->', GUY.trm.reverse GUY.trm.steel values
       for value, value_idx in values
