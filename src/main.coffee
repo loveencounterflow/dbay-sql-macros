@@ -102,7 +102,10 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
   _get_parameter_re: ( parameter ) -> /// (?<! \\ ) #{GUY.str.escape_for_regex parameter} \b ///gu
 
   #---------------------------------------------------------------------------------------------------------
-  resolve: ( sqlx ) =>
+  resolve: ( sqlx ) => @_resolve sqlx, 0
+
+  #---------------------------------------------------------------------------------------------------------
+  _resolve: ( sqlx, level ) =>
     # whisper '---------------------------------'
     # help '^56-1^', rpr sqlx
     @types.validate.nonempty.text sqlx
@@ -136,11 +139,11 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       #.....................................................................................................
       # help '^56-2^', ( rpr tail ), '->', GUY.trm.reverse GUY.trm.steel values
       for value, value_idx in values
-        value = @resolve value if ( value.match pnre )?
+        value = @resolve value, level + 1 if ( value.match pnre )?
         ### NOTE using a function to avoid accidental replacement semantics ###
         body  = body.replace declaration.parameter_res[ value_idx ], => value
       #.....................................................................................................
-      body      = @resolve body if ( body.match pnre )?
+      body      = @resolve body, level + 1 if ( body.match pnre )?
       R.push body
       position += stop_idx
     #.......................................................................................................
@@ -149,7 +152,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
     R = R.join ''
     #.....................................................................................................
     ### NOTE using a function to avoid accidental replacement semantics ###
-    R = R.replace @cfg._escaped_prefix_re, => @cfg.prefix
+    R = R.replace @cfg._escaped_prefix_re, => @cfg.prefix if level is 0
     return R
 
   #---------------------------------------------------------------------------------------------------------
