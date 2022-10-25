@@ -214,6 +214,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
     #.......................................................................................................
     level       = 0
     comma_idxs  = [ { start: null, stop: 1, }, ]
+    do_break    = false
     for token in sql_lexer.tokenize sqlx
       switch token.type
         when 'left_paren'
@@ -222,12 +223,14 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
           level--
           if level < 1
             comma_idxs.push { start: token.idx, stop: null, }
+            do_break = true
             break
         when 'comma'
           if level is 1
             comma_idxs.push { start: token.idx, stop: token.idx + token.text.length, }
         else
           null
+      break if do_break
     R.stop_idx = ( comma_idxs.at -1 ).start + 1 ### NOTE should be Unicode-safe b/c we know it's `)` ###
     #.......................................................................................................
     for idx in [ 1 ... comma_idxs.length ]
