@@ -104,8 +104,6 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       last_idx  = match.index + name.length
       R.push sqlx[ position ... match.index ]
       continue unless sqlx[ last_idx ] is '('
-      debug '^56-8^', @_declarations
-      debug '^56-8^', { name, last_idx, }, R
       #.....................................................................................................
       unless ( declaration = @_declarations[ name ] )?
         throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/dbm@5^', "unknown macro #{rpr name}"
@@ -122,10 +120,10 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       { body }        = declaration
       for parameter_re, parameter_idx in declaration.parameter_res
         ### TAINT must use lexer to make replacements ###
-        urge '^56-1^', ( rpr values[ parameter_idx ] ), '->', rpr @resolve values[ parameter_idx ]
+        # urge '^56-1^', ( rpr values[ parameter_idx ] ), '->', rpr @resolve values[ parameter_idx ]
         body = body.replace parameter_re, @resolve values[ parameter_idx ]
-        info '^56-2^', rpr R
-        info '^56-2^', rpr body
+        # info '^56-2^', rpr R
+        # info '^56-2^', rpr body
         # body = body.replace parameter_re, values[ parameter_idx ]
       #.....................................................................................................
       ### TAINT ^hardwired-sigil^ this hardwires `@` as sigil ###
