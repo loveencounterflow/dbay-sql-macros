@@ -73,6 +73,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
     @types.validate.dbm_parameter_list parameters
     #.......................................................................................................
     current_idx                 = parameters_re?.lastIndex
+    throw new DBay_sqlm_internal_error '^dbay/dbm@3^', "current_idx has not been set" unless current_idx?
     body                        = sqlx[ current_idx ... ].replace /\s*;\s*$/u, ''
     arity                       = parameters.length
     @_declare { name, parameters, arity, body, }
