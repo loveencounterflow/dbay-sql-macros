@@ -3,12 +3,12 @@ lockfileVersion: 5.4
 specifiers:
   dbay-sql-lexer: 1.1.0
   guy: 11.13.0
-  intertype: 0.105.0
+  intertype: 0.105.1
 
 dependencies:
   dbay-sql-lexer: 1.1.0
   guy: 11.13.0
-  intertype: 0.105.0
+  intertype: 0.105.1
 
 packages:
 
@@ -78,8 +78,8 @@ packages:
       multimix: 5.0.0
     dev: false
 
-  /intertype/0.105.0:
-    resolution: {integrity: sha512-Cjyo+LH1BjcJb2pU8UYpUvkcxGekDD5SV9nLPpIlXhBI097pLggVAmkx1hqroH2UE3AfcDOMtIp27VsQHQNVXQ==}
+  /intertype/0.105.1:
+    resolution: {integrity: sha512-FfQfpmIrVGP16P1rIWG2lw9RjyOJyJnwSbbLYpE+R8I7Sdd1Gub0ACzTk5opEZ+3Re0hB/0CxdhuY3wnJr7JjQ==}
     dependencies:
       guy: 11.12.0
       intertype-legacy: 7.7.1
