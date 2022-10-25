@@ -37,7 +37,9 @@ class DBay_sqlm_error extends Error
 #===========================================================================================================
 class DBay_sqlm_internal_error            extends DBay_sqlm_error
   constructor: ( ref, message )     -> super ref, message
-class DBay_sqlm_TOBESPECIFIED_error            extends DBay_sqlm_error
+class DBay_sqlm_unknown_macro_error       extends DBay_sqlm_error
+  constructor: ( ref, name )        -> super ref, "unknown macro #{rpr name}"
+class DBay_sqlm_TOBESPECIFIED_error       extends DBay_sqlm_error
   constructor: ( ref, message )     -> super ref, message
 
 
@@ -106,7 +108,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       continue unless sqlx[ last_idx ] is '('
       #.....................................................................................................
       unless ( declaration = @_declarations[ name ] )?
-        throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/dbm@5^', "unknown macro #{rpr name}"
+        throw new DBay_sqlm_unknown_macro_error '^dbay/dbm@5^', name
       #.....................................................................................................
       tail            = sqlx[ last_idx ... ]
       { values
