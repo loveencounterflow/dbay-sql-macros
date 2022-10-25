@@ -48,7 +48,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
 
   #---------------------------------------------------------------------------------------------------------
   constructor: ( cfg ) ->
-    GUY.props.hide @, 'types',          require './types'
+    GUY.props.hide @, 'types',          ( require './types' )()
     GUY.props.hide @, '_declarations',  {}
     @cfg = @types.create.dbm_constructor_cfg cfg
     return undefined
