@@ -1,12 +1,12 @@
 lockfileVersion: 5.4
 
 specifiers:
-  dbay-sql-lexer: ^1.0.0
+  dbay-sql-lexer: 1.1.0
   guy: 11.13.0
   intertype: 0.105.0
 
 dependencies:
-  dbay-sql-lexer: 1.0.0
+  dbay-sql-lexer: 1.1.0
   guy: 11.13.0
   intertype: 0.105.0
 
@@ -17,8 +17,8 @@ packages:
     engines: {node: '>=8'}
     dev: false
 
-  /dbay-sql-lexer/1.0.0:
-    resolution: {integrity: sha512-+xTBew41AOGtnewA3YyzrsQTP+2LRVTfb77akjSpS1KJt3+Px/iUZ7JJtkLOL6Xk+K5hTBjLVRVPdbNxy6pI3w==}
+  /dbay-sql-lexer/1.1.0:
+    resolution: {integrity: sha512-fu4+VbDHClhDzUzjX76CxTDeSd6+GBv/zh18eK2SVaEDsrp/FRha3+BWqYQbAKWDAjqCswmY/uao4wkgrUgP8Q==}
     dependencies:
       guy: 11.11.0
     transitivePeerDependencies:
