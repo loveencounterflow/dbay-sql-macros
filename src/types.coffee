@@ -57,10 +57,11 @@ module.exports = ->
       #.....................................................................................................
       prefix                  = escape_for_regex R.prefix
       name_re                 = R.name_re.source
-      R._lone_name_re         = /// ^ #{prefix} #{name_re}             $ ///u
-      R._bare_name_re         = ///   #{prefix} #{name_re} \b (?! [(] )  ///sgu
-      R._paren_name_re        = ///   #{prefix} #{name_re} \b (?= [(] )  ///sgu
-      R._start_paren_name_re  = /// ^ #{prefix} #{name_re} \b (?= [(] )  ///u
+      R._escaped_prefix_re    = /// \\ #{prefix}                          ///gu
+      R._lone_name_re         = /// ^  #{prefix} #{name_re}             $ ///u
+      R._bare_name_re         = ///    #{prefix} #{name_re} \b (?! [(] )  ///sgu
+      R._paren_name_re        = ///    #{prefix} #{name_re} \b (?= [(] )  ///sgu
+      R._start_paren_name_re  = /// ^  #{prefix} #{name_re} \b (?= [(] )  ///u
       #.....................................................................................................
       declare.dbm_parameter_list ( x ) ->
         return false unless @isa.list.of.nonempty.text x
