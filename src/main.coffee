@@ -97,6 +97,58 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
 
   #---------------------------------------------------------------------------------------------------------
   resolve: ( sqlx ) =>
+    # whisper '---------------------------------'
+    # help '^56-1^', rpr sqlx
+    @types.validate.nonempty.text sqlx
+    R         = []
+    position  = 0
+    pnre      = @cfg._paren_name_re
+    #.......................................................................................................
+    loop
+      pnre.lastIndex  = position
+      match           = pnre.exec sqlx
+      # debug '^57-1^', match
+      break unless match?
+      R.push sqlx[ position ... match.index ]
+      name            = match[ 0 ]
+      #.....................................................................................................
+      unless ( declaration = @_declarations[ name ] )?
+        throw new DBay_sqlm_unknown_macro_error '^dbay/dbm@5^', name
+      #.....................................................................................................
+      position        = match.index + name.length
+      tail            = sqlx[ position ... ]
+      # urge '^57-1^', { name, position, tail, }, R
+      #.....................................................................................................
+      { body }        = declaration
+      { values
+        stop_idx  }   = @_find_arguments tail
+      call_arity      = values.length
+      #.....................................................................................................
+      unless call_arity is declaration.arity
+        throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/dbm@6^', "expected #{declaration.arity} argument(s), got #{call_arity}"
+      #.....................................................................................................
+      # help '^56-2^', ( rpr tail ), '->', GUY.trm.reverse GUY.trm.steel values
+      for value, value_idx in values
+        value = @resolve value if ( value.match pnre )?
+        ### NOTE using a function to avoid accidental replacement semantics ###
+        body  = body.replace declaration.parameter_res[ value_idx ], => value
+      #.....................................................................................................
+      body      = @resolve body if ( body.match pnre )?
+      R.push body
+      position += stop_idx
+    #.......................................................................................................
+    R.push sqlx[ position ... ] if 0 < position <= sqlx.length
+    # R = R.join '█'
+    R = R.join ''
+    #.....................................................................................................
+    ### NOTE using a function to avoid accidental replacement semantics ###
+    R = R.replace @cfg._escaped_prefix_re, => @cfg.prefix
+    return R
+
+  #---------------------------------------------------------------------------------------------------------
+  XXXXXXXXXXXXXXXXXXX_resolve_old: ( sqlx ) =>
+    whisper '---------------------------------'
+    help '^56-1^', rpr sqlx
     @types.validate.nonempty.text sqlx
     sql_before                      = sqlx
     position                        = 0
@@ -110,22 +162,26 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       unless ( declaration = @_declarations[ name ] )?
         throw new DBay_sqlm_unknown_macro_error '^dbay/dbm@5^', name
       #.....................................................................................................
+      { body }        = declaration
       tail            = sqlx[ last_idx ... ]
       { values
         stop_idx  }   = @_find_arguments tail
       call_arity      = values.length
+      help '^56-2^', ( rpr tail ), '->', GUY.trm.reverse GUY.trm.steel values
       #.....................................................................................................
       unless call_arity is declaration.arity
         throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/dbm@6^', "expected #{declaration.arity} argument(s), got #{call_arity}"
       #.....................................................................................................
-      ### NOTE recursion must happen here ###
-      { body }        = declaration
       for parameter_re, parameter_idx in declaration.parameter_res
         ### TAINT must use lexer to make replacements ###
-        # urge '^56-1^', ( rpr values[ parameter_idx ] ), '->', rpr @resolve values[ parameter_idx ]
-        body = body.replace parameter_re, @resolve values[ parameter_idx ]
-        # info '^56-2^', rpr R
-        # info '^56-2^', rpr body
+        value = raw_value = values[ parameter_idx ]
+        value = @resolve value if ( value.match @cfg._paren_name_re )?
+        if value isnt raw_value then urge '^56-4^', ( rpr values[ parameter_idx ] ), '->', GUY.trm.reverse GUY.trm.green rpr value
+        whisper '^56-6^', rpr body
+        body  = body.replace parameter_re, value
+        # info '^56-5^', rpr R
+        debug '^56-6^', rpr body[ match.index ... ]
+        info '^56-6^', rpr body
         # body = body.replace parameter_re, values[ parameter_idx ]
       #.....................................................................................................
       ### NOTE using a function to avoid [accidental replacement
@@ -135,6 +191,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       R.push tail[ stop_idx .. ]
     R = if R.length is 0 then sqlx else R.join ''
     return @resolve R if ( R.match @cfg._paren_name_re )?
+    whisper '^56-1^', '******************************'
     return R
 
   #---------------------------------------------------------------------------------------------------------
