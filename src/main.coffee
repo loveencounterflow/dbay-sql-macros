@@ -56,25 +56,22 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
   #---------------------------------------------------------------------------------------------------------
   declare: ( sqlx ) =>
     @types.validate.nonempty.text sqlx
-    parameters_re           = null
-    @cfg.name_re.lastIndex  = 0
+    parameters_re               = null
+    @cfg.name_re.lastIndex      = 0
     #.......................................................................................................
-    unless ( match = sqlx.match @cfg.name_re )?
+    unless ( match = sqlx.match @cfg._start_paren_name_re )?
       throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@1^', "syntax error in #{rpr sqlx}"
-    name                    = match[ 0 ]
+    name                        = match[ 0 ]
+    position                    = match.index + name.length
     #.......................................................................................................
-    if sqlx[ @cfg.name_re.lastIndex ] is '('
-      parameters_re           = /\(\s*(?<parameters>[^)]*?)\s*\)\s*=\s*/yu
-      parameters_re.lastIndex = @cfg.name_re.lastIndex
-      unless ( match = sqlx.match parameters_re )?
-        throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@2^', "syntax error in #{rpr sqlx}"
-      { parameters, }         = match.groups
-      parameters              = parameters.split /\s*,\s*/u
-      parameters              = [] if equals parameters, [ '', ]
-    else
-      ### extension for declaration, call w/out parentheses left for later ###
-      # throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@3^', "syntax error: parentheses are obligatory but missing in #{rpr sqlx}"
-      parameters              = []
+    parameters_re               = /\(\s*(?<parameters>[^)]*?)\s*\)\s*=\s*/yu
+    parameters_re.lastIndex     = position
+    unless ( match = sqlx.match parameters_re )?
+      throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@2^', "syntax error in #{rpr sqlx}"
+    { parameters, }             = match.groups
+    parameters                  = parameters.split /\s*,\s*/u
+    parameters                  = [] if equals parameters, [ '', ]
+    @types.validate.dbm_parameter_list parameters
     #.......................................................................................................
     current_idx                 = parameters_re?.lastIndex ? @cfg.name_re.lastIndex
     body                        = sqlx[ current_idx ... ].replace /\s*;\s*$/u, ''
@@ -102,16 +99,17 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
     sql_before                      = sqlx
     position                        = 0
     R                               = []
-    @cfg._global_name_re.lastIndex  = 0
-    for match from sqlx.matchAll @cfg._global_name_re
+    for match from sqlx.matchAll @cfg._paren_name_re
       name      = match[ 0 ]
+      last_idx  = match.index + name.length
+      R.push sqlx[ position ... match.index ]
+      continue unless sqlx[ last_idx ] is '('
+      debug '^56-8^', @_declarations
+      debug '^56-8^', { name, last_idx, }, R
       #.....................................................................................................
       unless ( declaration = @_declarations[ name ] )?
         throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@4^', "unknown macro #{rpr name}"
       #.....................................................................................................
-      last_idx  = match.index + name.length
-      R.push sqlx[ position ... match.index ]
-      continue unless sqlx[ last_idx ] is '('
       tail            = sqlx[ last_idx ... ]
       { values
         stop_idx  }   = @_find_arguments tail
@@ -124,9 +122,10 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       { body }        = declaration
       for parameter_re, parameter_idx in declaration.parameter_res
         ### TAINT must use lexer to make replacements ###
-        debug '^56-1^', rpr values[ parameter_idx ]
-        debug '^56-1^', rpr @resolve values[ parameter_idx ]
+        urge '^56-1^', ( rpr values[ parameter_idx ] ), '->', rpr @resolve values[ parameter_idx ]
         body = body.replace parameter_re, @resolve values[ parameter_idx ]
+        info '^56-2^', rpr R
+        info '^56-2^', rpr body
         # body = body.replace parameter_re, values[ parameter_idx ]
       #.....................................................................................................
       ### TAINT ^hardwired-sigil^ this hardwires `@` as sigil ###
