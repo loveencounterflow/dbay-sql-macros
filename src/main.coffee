@@ -57,7 +57,6 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
   declare: ( sqlx ) =>
     @types.validate.nonempty.text sqlx
     parameters_re               = null
-    @cfg.name_re.lastIndex      = 0
     #.......................................................................................................
     unless ( match = sqlx.match @cfg._start_paren_name_re )?
       throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/dbm@1^', "syntax error in #{rpr sqlx}"
@@ -73,7 +72,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
     parameters                  = [] if equals parameters, [ '', ]
     @types.validate.dbm_parameter_list parameters
     #.......................................................................................................
-    current_idx                 = parameters_re?.lastIndex ? @cfg.name_re.lastIndex
+    current_idx                 = parameters_re?.lastIndex
     body                        = sqlx[ current_idx ... ].replace /\s*;\s*$/u, ''
     arity                       = parameters.length
     @_declare { name, parameters, arity, body, }
