@@ -131,7 +131,9 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       body = body.replace @cfg._escaped_prefix_re, => @cfg.prefix
       R.push body
       R.push tail[ stop_idx .. ]
-    return if R.length is 0 then sqlx else R.join ''
+    R = if R.length is 0 then sqlx else R.join ''
+    return @resolve R if ( R.match @cfg._paren_name_re )?
+    return R
 
   #---------------------------------------------------------------------------------------------------------
   _find_arguments: ( sqlx ) ->
