@@ -60,14 +60,14 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
     @cfg.name_re.lastIndex      = 0
     #.......................................................................................................
     unless ( match = sqlx.match @cfg._start_paren_name_re )?
-      throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@1^', "syntax error in #{rpr sqlx}"
+      throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/dbm@1^', "syntax error in #{rpr sqlx}"
     name                        = match[ 0 ]
     position                    = match.index + name.length
     #.......................................................................................................
     parameters_re               = /\(\s*(?<parameters>[^)]*?)\s*\)\s*=\s*/yu
     parameters_re.lastIndex     = position
     unless ( match = sqlx.match parameters_re )?
-      throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@2^', "syntax error in #{rpr sqlx}"
+      throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/dbm@2^', "syntax error in #{rpr sqlx}"
     { parameters, }             = match.groups
     parameters                  = parameters.split /\s*,\s*/u
     parameters                  = [] if equals parameters, [ '', ]
@@ -83,7 +83,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
   #---------------------------------------------------------------------------------------------------------
   _declare: ( cfg ) ->
     if @_declarations[ cfg.name ]?
-      throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@2^', "can not re-declare #{rpr cfg.name}"
+      throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/dbm@4^', "can not re-declare #{rpr cfg.name}"
     cfg.parameter_res           = ( @_get_parameter_re p for p in cfg.parameters )
     @_declarations[ cfg.name ]  = cfg
     return null
@@ -108,7 +108,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       debug '^56-8^', { name, last_idx, }, R
       #.....................................................................................................
       unless ( declaration = @_declarations[ name ] )?
-        throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@4^', "unknown macro #{rpr name}"
+        throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/dbm@5^', "unknown macro #{rpr name}"
       #.....................................................................................................
       tail            = sqlx[ last_idx ... ]
       { values
@@ -116,7 +116,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       call_arity      = values.length
       #.....................................................................................................
       unless call_arity is declaration.arity
-        throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/sqlx@5^', "expected #{declaration.arity} argument(s), got #{call_arity}"
+        throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/dbm@6^', "expected #{declaration.arity} argument(s), got #{call_arity}"
       #.....................................................................................................
       ### NOTE recursion must happen here ###
       { body }        = declaration
@@ -137,7 +137,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
   #---------------------------------------------------------------------------------------------------------
   _find_arguments: ( sqlx ) ->
     unless sqlx[ 0 ] is '('
-      throw new DBay_sqlm_internal_error '^dbay/sqlx@6^', "source must start with left bracket, got #{rpr sqlx}"
+      throw new DBay_sqlm_internal_error '^dbay/dbm@7^', "source must start with left bracket, got #{rpr sqlx}"
     sqlx    = sqlx.trim()
     values  = []
     R       = { values, stop_idx: null, }
