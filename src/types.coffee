@@ -15,6 +15,11 @@ GUY                       = require 'guy'
   echo }                  = GUY.trm
 { escape_for_regex }      = GUY.str
 
+# #-----------------------------------------------------------------------------------------------------------
+# escape_for_replacement = ( text ) ->
+#   R = text
+#   R = R.replace /[$]/g,
+
 #-----------------------------------------------------------------------------------------------------------
 module.exports = ->
   types       = new ( require 'intertype' ).Intertype()
@@ -58,6 +63,7 @@ module.exports = ->
       prefix                  = escape_for_regex R.prefix
       name_re                 = R.name_re.source
       R._escaped_prefix_re    = /// \\ #{prefix}                          ///gu
+      # R._prefix_replacement   = escape_for_replacement R.prefix
       R._lone_name_re         = /// ^  #{prefix} #{name_re}             $ ///u
       R._bare_name_re         = ///    #{prefix} #{name_re} \b (?! [(] )  ///sgu
       R._paren_name_re        = ///    #{prefix} #{name_re} \b (?= [(] )  ///sgu
