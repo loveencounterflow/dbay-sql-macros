@@ -126,8 +126,9 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
         # info '^56-2^', rpr body
         # body = body.replace parameter_re, values[ parameter_idx ]
       #.....................................................................................................
-      ### TAINT ^hardwired-sigil^ this hardwires `@` as sigil ###
-      body = body.replace /\\@/gu, '@'
+      ### NOTE using a function to avoid [accidental replacement
+      semantics](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace) ###
+      body = body.replace @cfg._escaped_prefix_re, => @cfg.prefix
       R.push body
       R.push tail[ stop_idx .. ]
     return if R.length is 0 then sqlx else R.join ''
