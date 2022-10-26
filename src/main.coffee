@@ -156,55 +156,6 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
     return R
 
   #---------------------------------------------------------------------------------------------------------
-  XXXXXXXXXXXXXXXXXXX_resolve_old: ( sqlx ) =>
-    whisper '---------------------------------'
-    help '^56-1^', rpr sqlx
-    @types.validate.nonempty.text sqlx
-    sql_before                      = sqlx
-    position                        = 0
-    R                               = []
-    for match from sqlx.matchAll @cfg._paren_name_re
-      name      = match[ 0 ]
-      last_idx  = match.index + name.length
-      R.push sqlx[ position ... match.index ]
-      continue unless sqlx[ last_idx ] is '('
-      #.....................................................................................................
-      unless ( declaration = @_declarations[ name ] )?
-        throw new DBay_sqlm_unknown_macro_error '^dbay/dbm@5^', name
-      #.....................................................................................................
-      { body }        = declaration
-      tail            = sqlx[ last_idx ... ]
-      { values
-        stop_idx  }   = @_find_arguments tail
-      call_arity      = values.length
-      help '^56-2^', ( rpr tail ), '->', GUY.trm.reverse GUY.trm.steel values
-      #.....................................................................................................
-      unless call_arity is declaration.arity
-        throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/dbm@6^', "expected #{declaration.arity} argument(s), got #{call_arity}"
-      #.....................................................................................................
-      for parameter_re, parameter_idx in declaration.parameter_res
-        ### TAINT must use lexer to make replacements ###
-        value = raw_value = values[ parameter_idx ]
-        value = @resolve value if ( value.match @cfg._paren_name_re )?
-        if value isnt raw_value then urge '^56-4^', ( rpr values[ parameter_idx ] ), '->', GUY.trm.reverse GUY.trm.green rpr value
-        whisper '^56-6^', rpr body
-        body  = body.replace parameter_re, value
-        # info '^56-5^', rpr R
-        debug '^56-6^', rpr body[ match.index ... ]
-        info '^56-6^', rpr body
-        # body = body.replace parameter_re, values[ parameter_idx ]
-      #.....................................................................................................
-      ### NOTE using a function to avoid [accidental replacement
-      semantics](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace) ###
-      body = body.replace @cfg._escaped_prefix_re, => @cfg.prefix
-      R.push body
-      R.push tail[ stop_idx .. ]
-    R = if R.length is 0 then sqlx else R.join ''
-    return @resolve R if ( R.match @cfg._paren_name_re )?
-    whisper '^56-1^', '******************************'
-    return R
-
-  #---------------------------------------------------------------------------------------------------------
   _find_arguments: ( sqlx ) ->
     unless sqlx[ 0 ] is '('
       throw new DBay_sqlm_internal_error '^dbay/dbm@7^', "source must start with left bracket, got #{rpr sqlx}"
