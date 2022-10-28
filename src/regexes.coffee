@@ -82,16 +82,12 @@ Character (CHR) regexes (RXs) are divided into two modes:
 
 #-----------------------------------------------------------------------------------------------------------
 @get_rx_for_parameter = ( mode = 'practical', vanisher = '|', parameter ) -> ///
+  (?<! \\ )
+  #{GUY.str.escape_for_regex parameter}
   (?:
-    (?<! \\ )
-    #{GUY.str.escape_for_regex parameter}
-    #{GUY.str.escape_for_regex vanisher}
-    )
-  |
-  (?:
-    (?<! \\ )
-    #{GUY.str.escape_for_regex parameter}
-    (?! #{@rx.chrs[ mode ].forbidden.paren.source} )
+    (?: #{GUY.str.escape_for_regex vanisher} )
+    |
+    (?: (?! #{@rx.chrs[ mode ].forbidden.paren.source} ) )
     )
   ///gu
 
