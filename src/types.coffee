@@ -14,6 +14,8 @@ GUY                       = require 'guy'
 { rpr
   echo }                  = GUY.trm
 { escape_for_regex }      = GUY.str
+rx                        = require './regexes'
+
 
 # #-----------------------------------------------------------------------------------------------------------
 # escape_for_replacement = ( text ) ->
@@ -38,6 +40,7 @@ module.exports = ->
     return false if x.global
     return false if x.sticky
     return true
+
 
   #---------------------------------------------------------------------------------------------------------
   declare.dbm_constructor_cfg
