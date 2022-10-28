@@ -106,10 +106,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
 
   #---------------------------------------------------------------------------------------------------------
   _resolve: ( sqlx, level ) =>
-    # whisper '---------------------------------'
-    # help '^56-1^', rpr sqlx
     @types.validate.nonempty.text sqlx
-    return sqlx if ( Object.keys @_declarations ).length is 0
     R         = []
     position  = 0
     pnre      = @cfg._paren_name_re
