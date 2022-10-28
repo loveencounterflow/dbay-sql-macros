@@ -1,6 +1,6 @@
 
-xxx =
-  prefix: '@'
+'use strict'
+
 ###
 
 Character (CHR) regexes (RXs) are divided into two modes:
@@ -21,6 +21,11 @@ Character (CHR) regexes (RXs) are divided into two modes:
   * are given as positive character classes within a single pair of square brackets.
 
 ###
+
+
+
+#-----------------------------------------------------------------------------------------------------------
+@rx =
   chrs:
     strict:
       allowed:
@@ -29,7 +34,7 @@ Character (CHR) regexes (RXs) are divided into two modes:
       forbidden:
         head:     /// [  \x00-\x2f           \x3a-\x40 \x5b-\x5e \x60 \x7b-\x7f ] ///u
         tail:     /// [  \x00-\x23 \x25-\x2f \x3a-\x40 \x5b-\x5e \x60 \x7b-\x7f ] ///u
-        paren:   /// [  ( $ 0-9 A-Z _ a-z \u{0080}-\u{10ffff}  ] ///u
+        paren:    /// [  ( $ 0-9 A-Z _ a-z \u{0080}-\u{10ffff}  ] ///u
     practical:
       allowed:
         head:     /// [        A-Z _ a-z \u{00a1}-\u{10ffff}  ] ///u
@@ -39,25 +44,26 @@ Character (CHR) regexes (RXs) are divided into two modes:
         tail:     /// [  \x00-\x23 \x25-\x2f \x3a-\x40 \x5b-\x5e \x60 \x7b-\xa0 ] ///u
         paren:    /// [  ( $ 0-9 A-Z _ a-z \u{00a1}-\u{10ffff}  ] ///u
 
-xxx.name = ///
-            # (?<= ^ | #{xxx.chrs.practical.forbidden.head.source} )
-            #{xxx.prefix}
-            #{xxx.chrs.practical.allowed.head.source}
-            #{xxx.chrs.practical.allowed.tail.source}*
-            ///sgu
-xxx.bare_name = ///
-            # (?<= ^ | #{xxx.chrs.practical.forbidden.head.source} )
-            #{xxx.prefix}
-            #{xxx.chrs.practical.allowed.head.source}
-            #{xxx.chrs.practical.allowed.tail.source}*
-            (?! #{xxx.chrs.practical.forbidden.paren.source} )
-            ///sgu
-xxx.paren_name = ///
-            # (?<= ^ | #{xxx.chrs.practical.forbidden.head.source} )
-            #{xxx.prefix}
-            #{xxx.chrs.practical.allowed.head.source}
-            #{xxx.chrs.practical.allowed.tail.source}*
-            (?= [(] )
-            ///sgu
+#-----------------------------------------------------------------------------------------------------------
+@get_rx_for_any_name = ( prefix = '@', mode = 'practical' ) -> ///
+  #{prefix}
+  #{@rx.chrs[ mode ].allowed.head.source}
+  #{@rx.chrs[ mode ].allowed.tail.source}*
+  ///sgu
 
-module.exports = xxx
+#-----------------------------------------------------------------------------------------------------------
+@get_rx_for_bare_name = ( prefix = '@', mode = 'practical' ) -> ///
+  #{prefix}
+  #{@rx.chrs[ mode ].allowed.head.source}
+  #{@rx.chrs[ mode ].allowed.tail.source}*
+  (?! #{@rx.chrs[ mode ].forbidden.paren.source} )
+  ///sgu
+
+#-----------------------------------------------------------------------------------------------------------
+@get_rx_for_paren_name = ( prefix = '@', mode = 'practical' ) -> ///
+  #{prefix}
+  #{@rx.chrs[ mode ].allowed.head.source}
+  #{@rx.chrs[ mode ].allowed.tail.source}*
+  (?= [(] )
+  ///sgu
+
