@@ -87,6 +87,8 @@ Notes:
   appearance of that parameter's name in the macro body, even when they should appear inside of, say, string
   literals. To block replacements, prefix the parameter name in the macro body with a backslash. These
   backslashes will be removed from the result.
+* A parameter in a macro's body may end in a 'vanishing terminator', currently fixed as `|`. This enables
+  replacements in contexts without explicit spaces or other identifier-delimiters
 
 ```
 m.declare SQL"""@add( @a, @b ) = ( @a + @b );"""
@@ -144,18 +146,20 @@ create table t (
 * **[–]** should macros be undone when declared inside a failed transaction?
 * **[–]** allow to escape left parens as `\(` in order to ensure that a parameter name does not get confused
   with a macro name
-* **[–]** relatedly, either
-  * implement an escape sequence that allows to use a parameter value without spacing
-    inside of arbitrary text, or else
-  * allow braces as in `abc@{foo}xyz` (better) or `abc{@foo}xyz`, or else
-  * use an optional 'vanishing' terminator, as in `abc@foo;xyz`, `abc@foo|xyz`
 * **[–]** allow 'constant macros'/'global constant parameters'? would this be a return to paren-less macro
   calls? if a name clash should occur between a macro's parameter names and such a 'global constant', which
   one should win out?—Maybe better to rule out any such name clashes.
+* **[–]** allow to escape vanishing terminator
 
 ## Is Done
 
 * **[+]** after expansions are done, check whether `cfg.name_re` matches any remaining parts
 * **[+]** use `u`nicode flag on all regexes
+* **[+]** relatedly, either
+  * implement an escape sequence that allows to use a parameter value without spacing
+    inside of arbitrary text, or else
+  * allow braces as in `abc@{foo}xyz` (better) or `abc{@foo}xyz`, or else
+  * could use brackets, backticks, and/or dquotes as in `abc@[foo]xyz`, ``abc@`foo`xyz``, `abc@"foo"xyz`,
+  * use an optional 'vanishing' terminator, as in `abc@foo;xyz`, `abc@foo|xyz`
 
 
