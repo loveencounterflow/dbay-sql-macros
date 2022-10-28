@@ -144,9 +144,14 @@ create table t (
 * **[–]** should macros be undone when declared inside a failed transaction?
 * **[–]** allow to escape left parens as `\(` in order to ensure that a parameter name does not get confused
   with a macro name
-* **[–]** relatedly, implement an escape sequence that allows to use a parameter value without spacing
-  inside of arbitrary text; maybe use braces as in `@{foo}` (better) or `{@foo}`
-
+* **[–]** relatedly, either
+  * implement an escape sequence that allows to use a parameter value without spacing
+    inside of arbitrary text, or else
+  * allow braces as in `abc@{foo}xyz` (better) or `abc{@foo}xyz`, or else
+  * use an optional 'vanishing' terminator, as in `abc@foo;xyz`, `abc@foo|xyz`
+* **[–]** allow 'constant macros'/'global constant parameters'? would this be a return to paren-less macro
+  calls? if a name clash should occur between a macro's parameter names and such a 'global constant', which
+  one should win out?—Maybe better to rule out any such name clashes.
 
 ## Is Done
 
