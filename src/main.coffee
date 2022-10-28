@@ -22,6 +22,7 @@ GUY                       = require 'guy'
 # new_xregex                = require 'xregexp'
 # E                         = require '../../../apps/dbay/lib/errors'
 sql_lexer                 = require 'dbay-sql-lexer'
+rx                        = require './regexes'
 
 
 #-----------------------------------------------------------------------------------------------------------
@@ -92,14 +93,10 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
   _declare: ( cfg ) ->
     if @_declarations[ cfg.name ]?
       throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/dbm@4^', "can not re-declare #{rpr cfg.name}"
-    cfg.parameter_res           = ( @_get_parameter_re p for p in cfg.parameters )
+    ### TAINT use `@cfg.vanisher` instead of `|` ###
+    cfg.parameter_res           = ( rx.get_rx_for_parameter 'practical', '|', p for p in cfg.parameters )
     @_declarations[ cfg.name ]  = cfg
     return null
-
-  #---------------------------------------------------------------------------------------------------------
-  ### TAINT see https://shiba1014.medium.com/regex-word-boundaries-with-unicode-207794f6e7ed
-  for Unicode-compliant alternatives to the trailing `\b`; OTOH we're dealing w/ mostly-ASCII SQL here ###
-  _get_parameter_re: ( parameter ) -> /// (?<! \\ ) #{GUY.str.escape_for_regex parameter} \b ///gu
 
   #---------------------------------------------------------------------------------------------------------
   resolve: ( sqlx ) => @_resolve sqlx, 0
@@ -140,6 +137,8 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       for value, value_idx in values
         value = @resolve value, level + 1 if ( value.match pnre )?
         ### NOTE using a function to avoid accidental replacement semantics ###
+        debug '^35345^', declaration.parameter_res[ value_idx ]
+        debug '^35345^', ( m for m from body.matchAll declaration.parameter_res[ value_idx ] )
         body  = body.replace declaration.parameter_res[ value_idx ], => value
       #.....................................................................................................
       body      = @resolve body, level + 1 if ( body.match pnre )?

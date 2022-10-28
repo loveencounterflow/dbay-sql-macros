@@ -1,6 +1,10 @@
 
 'use strict'
 
+############################################################################################################
+GUY                       = require 'guy'
+
+
 ###
 
 Character (CHR) regexes (RXs) are divided into two modes:
@@ -75,4 +79,19 @@ Character (CHR) regexes (RXs) are divided into two modes:
   #{@rx.chrs[ mode ].allowed.tail.source}*
   (?= [(] )
   ///u
+
+#-----------------------------------------------------------------------------------------------------------
+@get_rx_for_parameter = ( mode = 'practical', vanisher = '|', parameter ) -> ///
+  (?:
+    (?<! \\ )
+    #{GUY.str.escape_for_regex parameter}
+    #{GUY.str.escape_for_regex vanisher}
+    )
+  |
+  (?:
+    (?<! \\ )
+    #{GUY.str.escape_for_regex parameter}
+    (?! #{@rx.chrs[ mode ].forbidden.paren.source} )
+    )
+  ///gu
 
