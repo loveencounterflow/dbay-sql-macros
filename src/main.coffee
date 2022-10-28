@@ -109,9 +109,11 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
     # whisper '---------------------------------'
     # help '^56-1^', rpr sqlx
     @types.validate.nonempty.text sqlx
+    return sqlx if ( Object.keys @_declarations ).length is 0
     R         = []
     position  = 0
     pnre      = @cfg._paren_name_re
+    count     = 0
     #.......................................................................................................
     loop
       pnre.lastIndex  = position
@@ -146,12 +148,14 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       body      = @resolve body, level + 1 if ( body.match pnre )?
       R.push body
       position += stop_idx
+      count++
     #.......................................................................................................
     R.push sqlx[ position ... ] if 0 < position <= sqlx.length
     # R = R.join '█'
     R = R.join ''
     #.....................................................................................................
     ### NOTE using a function to avoid accidental replacement semantics ###
+    R = sqlx if count is 0
     R = R.replace @cfg._escaped_prefix_re, => @cfg.prefix if level is 0
     return R
 
