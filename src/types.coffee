@@ -46,31 +46,39 @@ module.exports = ->
   declare.dbm_constructor_cfg
     fields:
       prefix:               'nonempty.text'
-      name_re:              'regex'
+      _any_name_re:         'regex'
       _bare_name_re:        'dbm_global_regex'
       _paren_name_re:       'dbm_global_regex'
       _start_paren_name_re: 'dbm_anchored_regex'
+      _escaped_prefix_re:   'dbm_global_regex'
       # _global_name_re:  'regex'
     default:
       prefix:               '@'
-      name_re:              /[\p{Letter}_][\p{Letter}_\d]*/u
+      # _any_name_re:              /[\p{Letter}_][\p{Letter}_\d]*/u
+      ### this regex lifted from Intertype@0.105.1/declarations ###
+      _any_name_re:         null
       _bare_name_re:        null
       _paren_name_re:       null
       _start_paren_name_re: null
+      _escaped_prefix_re:   null
       # _global_name_re:  null
     create: ( cfg ) ->
       R = { @registry.dbm_constructor_cfg.default..., cfg..., }
       return R unless @isa.nonempty.text R.prefix
-      return R unless @isa.regex R.name_re
       #.....................................................................................................
+      return R if R._any_name_re?
+      return R if R._bare_name_re?
+      return R if R._paren_name_re?
+      return R if R._start_paren_name_re?
+      return R if R._escaped_prefix_re?
+      #.....................................................................................................
+      ### TAINT harmonize naming, use either `re` or `rx` ###
       prefix                  = escape_for_regex R.prefix
-      name_re                 = R.name_re.source
-      R._escaped_prefix_re    = /// \\ #{prefix}                          ///gu
-      # R._prefix_replacement   = escape_for_replacement R.prefix
-      R._lone_name_re         = /// ^  #{prefix} #{name_re}             $ ///u
-      R._bare_name_re         = ///    #{prefix} #{name_re} \b (?! [(] )  ///sgu
-      R._paren_name_re        = ///    #{prefix} #{name_re} \b (?= [(] )  ///sgu
-      R._start_paren_name_re  = /// ^  #{prefix} #{name_re} \b (?= [(] )  ///u
+      R._any_name_re          = rx.get_rx_for_any_name          prefix, 'practical'
+      R._bare_name_re         = rx.get_rx_for_bare_name         prefix, 'practical'
+      R._paren_name_re        = rx.get_rx_for_paren_name        prefix, 'practical'
+      R._start_paren_name_re  = rx.get_rx_for_start_paren_name  prefix, 'practical'
+      R._escaped_prefix_re    = /// \\ #{prefix} ///gu
       #.....................................................................................................
       declare.dbm_parameter_list ( x ) ->
         return false unless @isa.list.of.nonempty.text x

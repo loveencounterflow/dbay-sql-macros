@@ -67,3 +67,12 @@ Character (CHR) regexes (RXs) are divided into two modes:
   (?= [(] )
   ///sgu
 
+#-----------------------------------------------------------------------------------------------------------
+@get_rx_for_start_paren_name = ( prefix = '@', mode = 'practical' ) -> ///
+  ^
+  #{prefix}
+  #{@rx.chrs[ mode ].allowed.head.source}
+  #{@rx.chrs[ mode ].allowed.tail.source}*
+  (?= [(] )
+  ///u
+
