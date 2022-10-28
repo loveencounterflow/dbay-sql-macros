@@ -97,6 +97,11 @@ do ->
   matcher = 'select ( ( ( 1 + 2 ) * 3 ) + ( 4 + ( 5 * 6 ) ) ) as p;'
 ```
 
+* U+3000 'Ideographic space' does not count as whitespace in SQLite
+* we do not require any kind of word break; macros and parameters can appear anywhere, even embedded between
+  other material or inside a string literal
+
+
 ## Use Case for Macros: Virtual Types
 
 ```sql
@@ -139,6 +144,8 @@ create table t (
 * **[–]** should macros be undone when declared inside a failed transaction?
 * **[–]** allow to escape left parens as `\(` in order to ensure that a parameter name does not get confused
   with a macro name
+* **[–]** relatedly, implement an escape sequence that allows to use a parameter value without spacing
+  inside of arbitrary text; maybe use braces as in `@{foo}` (better) or `{@foo}`
 
 
 ## Is Done
