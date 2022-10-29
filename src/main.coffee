@@ -83,7 +83,9 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
     { parameters, }             = match.groups
     parameters                  = parameters.split /\s*,\s*/u
     parameters                  = [] if equals parameters, [ '', ]
-    @types.validate.dbm_parameter_list parameters
+    unless @types.isa.dbm_parameter_list parameters
+      throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/dbm@2^', \
+        "syntax error in parameters of declaration #{rpr sqlx}"
     #.......................................................................................................
     current_idx                 = parameters_re?.lastIndex
     throw new DBay_sqlm_internal_error '^dbay/dbm@3^', "current_idx has not been set" unless current_idx?
