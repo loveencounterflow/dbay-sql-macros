@@ -40,10 +40,15 @@ class DBay_sqlm_internal_error            extends DBay_sqlm_error
   constructor: ( ref, message )     -> super ref, message
 class DBay_sqlm_unknown_macro_error       extends DBay_sqlm_error
   constructor: ( ref, name )        -> super ref, "unknown macro #{rpr name}"
+class DBay_sqlm_recursion_level_error       extends DBay_sqlm_error
+  constructor: ( ref, max_level )   -> super ref, "maximum recursion depth of #{max_level} reached"
+class DBay_sqlm_circular_references_error   extends DBay_sqlm_error
+  constructor: ( ref, names )        -> super ref, \
+    "circular references involving macros #{( rpr n for n from names ).join ', '} detected"
 class DBay_sqlm_unknown_parameters_error       extends DBay_sqlm_error
-  constructor: ( ref, names )        -> super ref, "unknown parameters #{( rpr n for n in names ).join ', '}"
+  constructor: ( ref, names )        -> super ref, "unknown parameters #{( rpr n for n from names ).join ', '}"
 class DBay_sqlm_duplicate_parameters_error     extends DBay_sqlm_error
-  constructor: ( ref, names )        -> super ref, "duplicate parameters #{( rpr n for n in names ).join ', '}"
+  constructor: ( ref, names )        -> super ref, "duplicate parameters #{( rpr n for n from names ).join ', '}"
 class DBay_sqlm_arity_error               extends DBay_sqlm_error
   constructor: ( ref, name, declaration_arity, call_arity, source, values ) ->
     super ref, """
@@ -122,15 +127,19 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
     return null
 
   #---------------------------------------------------------------------------------------------------------
-  resolve: ( sqlx ) => @_resolve sqlx, 0
+  resolve: ( sqlx ) => @_resolve sqlx, 0, new Set()
 
   #---------------------------------------------------------------------------------------------------------
-  _resolve: ( sqlx, level ) =>
+  _resolve: ( sqlx, level, seen ) =>
     @types.validate.nonempty.text sqlx
     R         = []
     position  = 0
     pnre      = @cfg._paren_name_re
     count     = 0
+    max_level = 50
+    #.......................................................................................................
+    if level > max_level
+      throw new DBay_sqlm_recursion_level_error '^dbay/dbm@4^', max_level
     #.......................................................................................................
     loop
       pnre.lastIndex  = position
@@ -139,6 +148,9 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       break unless match?
       R.push sqlx[ position ... match.index ]
       name            = match[ 0 ]
+      if seen.has name
+        throw new DBay_sqlm_circular_references_error '^dbay/dbm@4^', seen
+      seen.add name
       #.....................................................................................................
       unless ( declaration = @_declarations[ name ] )?
         throw new DBay_sqlm_unknown_macro_error '^dbay/dbm@5^', name
@@ -158,11 +170,11 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       #.....................................................................................................
       # help '^56-2^', ( rpr tail ), '->', GUY.trm.reverse GUY.trm.steel values
       for value, value_idx in values
-        value = @resolve value, level + 1 if ( value.match pnre )?
+        value = @_resolve value, level + 1, seen if ( value.match pnre )?
         ### NOTE using a function to avoid accidental replacement semantics ###
         body  = body.replace declaration.parameter_res[ value_idx ], => value
       #.....................................................................................................
-      body      = @resolve body, level + 1 if ( body.match pnre )?
+      body      = @_resolve body, level + 1, seen if ( body.match pnre )?
       R.push body
       position += stop_idx
       count++
