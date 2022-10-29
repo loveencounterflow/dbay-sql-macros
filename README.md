@@ -136,6 +136,7 @@ create table t (
 * **[–]** allow to escape vanishing terminator with a backslash instead of doubling it to reduce confusion
 * **[–]** consider to change escape character from `\` to something with less interaction with common source
   code escapes
+* **[–]** check for undeclared parameters in replacement text
 * **[–]** add settings to enable putting entire expansion and/or expansion of parameters within parentheses;
   this could happen both at declaration and/or at resolution time
   * **[–]** a similar setting could trigger inline comments that spell out the names of the resolved macros,
