@@ -140,7 +140,7 @@ create table t (
 * **[–]** add settings to enable putting entire expansion and/or expansion of parameters within parentheses;
   this could happen both at declaration and/or at resolution time
   * **[–]** a similar setting could trigger inline comments that spell out the names of the resolved macros,
-    parameters as in `select /*{@foo*/ /*{@a*/ 3 + /*{@b*/ 4 /*}*/`, might be useful for debugging—although
+    parameters as in `select /*{foo*/ /*{a*/ 3 + /*{b*/ 4 /*}*/`, might be useful for debugging—although
     even this simple snippet is hard to parse visually, so maybe better add a 'demo mode' with tabular
     output (think `explain` / `analyze`)?
 
