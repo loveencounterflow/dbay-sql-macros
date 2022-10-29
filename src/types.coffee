@@ -82,7 +82,7 @@ module.exports = ->
       #.....................................................................................................
       declare.dbm_parameter_list ( x ) ->
         return false unless @isa.list.of.nonempty.text x
-        return false unless x.every ( p ) -> ( p.match R._lone_name_re )?
+        return false unless x.every ( p ) -> ( p.match R._bare_name_re )?
         return true
       return R
 
