@@ -126,21 +126,6 @@ create table t (
 
 * **[–]** documentation
 * **[–]** safeguard against using a macro in its own expansion, leads to infinite regress
-* **[–]** allow parameters in parentheses to trigger expansions with parentheses, ex.:
-
-  ```coffee
-  declare SQL"""@foo( (@first), @second ) = @first * @second;"""
-  resolve SQL"""@foo( 1 + 2, 3 );"""
-  # gives
-  '( 1+2 ) * 3'
-  ```
-
-  Likewise, could allow SQL"""@foo = (( @a, @b ))""" to put parentheses around entire replacement
-
-* **[–]** do not allow macro calls without parentheses because only then can we distinguish between macro
-  names and parameter names
-* **[–]** sort macro names by length *and* lexicographically to avoid order of declaration having any kind
-  of effect
 * **[–]** should we use a more SQL-ish syntax similar to function declarations like `create macro @m as
   [begin] ... [end];`?
 * **[–]** allow to escape left parens as `\(` in order to ensure that a parameter name does not get confused
@@ -151,6 +136,12 @@ create table t (
 * **[–]** allow to escape vanishing terminator with a backslash instead of doubling it to reduce confusion
 * **[–]** consider to change escape character from `\` to something with less interaction with common source
   code escapes
+* **[–]** add settings to enable putting entire expansion and/or expansion of parameters within parentheses;
+  this could happen both at declaration and/or at resolution time
+  * **[–]** a similar setting could trigger inline comments that spell out the names of the resolved macros,
+    parameters as in `select /*{@foo*/ /*{@a*/ 3 + /*{@b*/ 4 /*}*/`, might be useful for debugging—although
+    even this simple snippet is hard to parse visually, so maybe better add a 'demo mode' with tabular
+    output (think `explain` / `analyze`)?
 
 ## Is Done
 
@@ -165,5 +156,20 @@ create table t (
 * **[+]** allow to escape vanishing terminator
 * **[+]** should really search through source to find macro calls, not use regex built from macro names
 * **[+]** <del>should macros be undone when declared inside a failed transaction?</del>
+* **[+]** do not allow macro calls without parentheses because only then can we distinguish between macro
+  names and parameter names
+* **[+]** <del>sort macro names by length *and* lexicographically to avoid order of declaration having any kind
+  of effect</del>
+* **[+]** replaced w/ issue to make this a s setting on declaration and/or resolution time <del>allow
+  parameters in parentheses to trigger expansions with parentheses, ex.:
+
+  ```coffee
+  declare SQL"""@foo( (@first), @second ) = @first * @second;"""
+  resolve SQL"""@foo( 1 + 2, 3 );"""
+  # gives
+  '( 1+2 ) * 3'
+  ```
+
+  Likewise, could allow SQL"""@foo = (( @a, @b ))""" to put parentheses around entire replacement</del>
 
 
