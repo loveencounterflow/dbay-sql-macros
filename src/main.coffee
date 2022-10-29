@@ -40,6 +40,8 @@ class DBay_sqlm_internal_error            extends DBay_sqlm_error
   constructor: ( ref, message )     -> super ref, message
 class DBay_sqlm_unknown_macro_error       extends DBay_sqlm_error
   constructor: ( ref, name )        -> super ref, "unknown macro #{rpr name}"
+class DBay_sqlm_unknown_parameters_error       extends DBay_sqlm_error
+  constructor: ( ref, names )        -> super ref, "unknown parameters #{( rpr n for n in names ).join ', '}"
 class DBay_sqlm_arity_error               extends DBay_sqlm_error
   constructor: ( ref, name, declaration_arity, call_arity, source, values ) ->
     super ref, """
@@ -93,9 +95,18 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
   _declare: ( cfg ) ->
     if @_declarations[ cfg.name ]?
       throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/dbm@4^', "can not re-declare #{rpr cfg.name}"
+    @_validate_parameters cfg.parameters, cfg.body
     ### TAINT use `@cfg.vanisher` instead of `|` ###
     cfg.parameter_res           = ( rx.get_rx_for_parameter 'practical', '|', p for p in cfg.parameters )
     @_declarations[ cfg.name ]  = cfg
+    return null
+
+  #---------------------------------------------------------------------------------------------------------
+  _validate_parameters: ( declared_parameters, body ) ->
+    used_parameters     = body.match @cfg._bare_name_re
+    unknown_parameters  = ( p for p in used_parameters when p not in declared_parameters )
+    if unknown_parameters.length isnt 0
+      throw new DBay_sqlm_unknown_parameters_error '^dbay/dbm@4^', unknown_parameters
     return null
 
   #---------------------------------------------------------------------------------------------------------
