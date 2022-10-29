@@ -103,7 +103,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
 
   #---------------------------------------------------------------------------------------------------------
   _validate_parameters: ( declared_parameters, body ) ->
-    used_parameters     = body.match @cfg._bare_name_re
+    used_parameters     = ( body.match @cfg._bare_name_re ) ? []
     unknown_parameters  = ( p for p in used_parameters when p not in declared_parameters )
     if unknown_parameters.length isnt 0
       throw new DBay_sqlm_unknown_parameters_error '^dbay/dbm@4^', unknown_parameters
