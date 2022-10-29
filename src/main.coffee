@@ -137,8 +137,6 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       for value, value_idx in values
         value = @resolve value, level + 1 if ( value.match pnre )?
         ### NOTE using a function to avoid accidental replacement semantics ###
-        debug '^35345^', declaration.parameter_res[ value_idx ]
-        debug '^35345^', ( m for m from body.matchAll declaration.parameter_res[ value_idx ] )
         body  = body.replace declaration.parameter_res[ value_idx ], => value
       #.....................................................................................................
       body      = @resolve body, level + 1 if ( body.match pnre )?
