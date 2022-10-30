@@ -87,9 +87,7 @@ Notes:
   appearance of that parameter's name in the macro body, even when they should appear inside of, say, string
   literals. To block replacements, prefix the parameter name in the macro body with a backslash. These
   backslashes will be removed from the result.
-* A parameter in a macro's body may end in a 'vanishing terminator', currently fixed as `|`. This enables
-  replacements in contexts without explicit spaces or other identifier-delimiters. In order to get a macro
-  where a literal `|` should directly follow the replacement text, use `||`.
+
 
 ```
 m.declare SQL"""@add( @a, @b ) = ( @a + @b );"""
@@ -132,7 +130,6 @@ create table t (
 * **[–]** allow 'constant macros'/'global constant parameters'? would this be a return to paren-less macro
   calls? if a name clash should occur between a macro's parameter names and such a 'global constant', which
   one should win out?—Maybe better to rule out any such name clashes.
-* **[–]** allow to escape vanishing terminator with a backslash instead of doubling it to reduce confusion
 * **[–]** consider to change escape character from `\` to something with less interaction with common source
   code escapes
 * **[–]** add settings to enable putting entire expansion and/or expansion of parameters within parentheses;
@@ -151,8 +148,8 @@ create table t (
     inside of arbitrary text, or else
   * allow braces as in `abc@{foo}xyz` (better) or `abc{@foo}xyz`, or else
   * could use brackets, backticks, and/or dquotes as in `abc@[foo]xyz`, ``abc@`foo`xyz``, `abc@"foo"xyz`,
-  * use an optional 'vanishing' terminator, as in `abc@foo;xyz`, `abc@foo|xyz`
-* **[+]** allow to escape vanishing terminator
+  * <del> use an optional 'vanishing' terminator, as in `abc@foo;xyz`, `abc@foo|xyz`</del>
+* **[+]** <del>allow to escape vanishing terminator</del>
 * **[+]** should really search through source to find macro calls, not use regex built from macro names
 * **[+]** <del>should macros be undone when declared inside a failed transaction?</del>
 * **[+]** do not allow macro calls without parentheses because only then can we distinguish between macro

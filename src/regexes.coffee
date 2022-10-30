@@ -87,11 +87,7 @@ Character (CHR) regexes (RXs) are divided into two modes:
 @get_rx_for_parameter = ( cfg, parameter ) -> ///
   (?<! #{cfg._escape_esc} )
   #{GUY.str.escape_for_regex parameter}
-  (?:
-    (?: #{cfg._vanish_esc} )
-    |
-    (?: (?! #{@rx.chrs[ cfg.mode ].forbidden.paren.source} ) )
-    )
+  (?: (?! #{@rx.chrs[ cfg.mode ].forbidden.paren.source} ) )
   ///gu
 
 #-----------------------------------------------------------------------------------------------------------
