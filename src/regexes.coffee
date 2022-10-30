@@ -49,45 +49,48 @@ Character (CHR) regexes (RXs) are divided into two modes:
         paren:    /// [  ( $ 0-9 A-Z _ a-z \u{00a1}-\u{10ffff}  ] ///u
 
 #-----------------------------------------------------------------------------------------------------------
-@get_rx_for_any_name = ( prefix = '@', mode = 'practical' ) -> ///
-  #{prefix}
-  #{@rx.chrs[ mode ].allowed.head.source}
-  #{@rx.chrs[ mode ].allowed.tail.source}*
+@get_rx_for_any_name = ( cfg ) -> ///
+  # (?<! #{cfg._escape_esc} )
+  #{cfg._prefix_esc}
+  #{@rx.chrs[ cfg.mode ].allowed.head.source}
+  #{@rx.chrs[ cfg.mode ].allowed.tail.source}*
   ///sgu
 
 #-----------------------------------------------------------------------------------------------------------
-@get_rx_for_bare_name = ( prefix = '@', mode = 'practical' ) -> ///
-  #{prefix}
-  #{@rx.chrs[ mode ].allowed.head.source}
-  #{@rx.chrs[ mode ].allowed.tail.source}*
-  (?! #{@rx.chrs[ mode ].forbidden.paren.source} )
+@get_rx_for_bare_name = ( cfg ) -> ///
+  # (?<! #{cfg._escape_esc} )
+  #{cfg._prefix_esc}
+  #{@rx.chrs[ cfg.mode ].allowed.head.source}
+  #{@rx.chrs[ cfg.mode ].allowed.tail.source}*
+  (?! #{@rx.chrs[ cfg.mode ].forbidden.paren.source} )
   ///sgu
 
 #-----------------------------------------------------------------------------------------------------------
-@get_rx_for_paren_name = ( prefix = '@', mode = 'practical' ) -> ///
-  #{prefix}
-  #{@rx.chrs[ mode ].allowed.head.source}
-  #{@rx.chrs[ mode ].allowed.tail.source}*
+@get_rx_for_paren_name = ( cfg ) -> ///
+  # (?<! #{cfg._escape_esc} )
+  #{cfg._prefix_esc}
+  #{@rx.chrs[ cfg.mode ].allowed.head.source}
+  #{@rx.chrs[ cfg.mode ].allowed.tail.source}*
   (?= [(] )
   ///sgu
 
 #-----------------------------------------------------------------------------------------------------------
-@get_rx_for_start_paren_name = ( prefix = '@', mode = 'practical' ) -> ///
+@get_rx_for_start_paren_name = ( cfg ) -> ///
   ^
-  #{prefix}
-  #{@rx.chrs[ mode ].allowed.head.source}
-  #{@rx.chrs[ mode ].allowed.tail.source}*
+  #{cfg._prefix_esc}
+  #{@rx.chrs[ cfg.mode ].allowed.head.source}
+  #{@rx.chrs[ cfg.mode ].allowed.tail.source}*
   (?= [(] )
   ///u
 
 #-----------------------------------------------------------------------------------------------------------
-@get_rx_for_parameter = ( mode = 'practical', vanisher = '|', parameter ) -> ///
-  (?<! \\ )
+@get_rx_for_parameter = ( cfg, parameter ) -> ///
+  (?<! #{cfg._escape_esc} )
   #{GUY.str.escape_for_regex parameter}
   (?:
-    (?: #{GUY.str.escape_for_regex vanisher} )
+    (?: #{cfg._vanish_esc} )
     |
-    (?: (?! #{@rx.chrs[ mode ].forbidden.paren.source} ) )
+    (?: (?! #{@rx.chrs[ cfg.mode ].forbidden.paren.source} ) )
     )
   ///gu
 

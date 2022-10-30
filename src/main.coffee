@@ -109,7 +109,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
     @_validate_parameters cfg.parameters, cfg.body
     @_validate_cycles cfg.name, cfg.body
     ### TAINT use `@cfg.vanisher` instead of `|` ###
-    cfg.parameter_res           = ( rx.get_rx_for_parameter 'practical', '|', p for p in cfg.parameters )
+    cfg.parameter_res           = ( rx.get_rx_for_parameter @cfg, p for p in cfg.parameters )
     @_declarations[ cfg.name ]  = cfg
     return null
 
