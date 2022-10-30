@@ -50,7 +50,7 @@ Character (CHR) regexes (RXs) are divided into two modes:
 
 #-----------------------------------------------------------------------------------------------------------
 @get_rx_for_any_name = ( cfg ) -> ///
-  # (?<! #{cfg._escape_esc} )
+  (?<! #{cfg._escape_esc} )
   #{cfg._prefix_esc}
   #{@rx.chrs[ cfg.mode ].allowed.head.source}
   #{@rx.chrs[ cfg.mode ].allowed.tail.source}*
@@ -58,7 +58,7 @@ Character (CHR) regexes (RXs) are divided into two modes:
 
 #-----------------------------------------------------------------------------------------------------------
 @get_rx_for_bare_name = ( cfg ) -> ///
-  # (?<! #{cfg._escape_esc} )
+  (?<! #{cfg._escape_esc} )
   #{cfg._prefix_esc}
   #{@rx.chrs[ cfg.mode ].allowed.head.source}
   #{@rx.chrs[ cfg.mode ].allowed.tail.source}*
@@ -67,7 +67,7 @@ Character (CHR) regexes (RXs) are divided into two modes:
 
 #-----------------------------------------------------------------------------------------------------------
 @get_rx_for_paren_name = ( cfg ) -> ///
-  # (?<! #{cfg._escape_esc} )
+  (?<! #{cfg._escape_esc} )
   #{cfg._prefix_esc}
   #{@rx.chrs[ cfg.mode ].allowed.head.source}
   #{@rx.chrs[ cfg.mode ].allowed.tail.source}*
