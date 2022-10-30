@@ -12,6 +12,7 @@
   "dependencies": {
     "dbay-sql-lexer": "1.1.0",
     "guy": "11.13.0",
-    "intertype": "0.105.1"
+    "intertype": "0.105.1",
+    "ltsort": "^1.3.1"
   }
 }
