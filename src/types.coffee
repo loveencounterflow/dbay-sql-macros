@@ -97,7 +97,11 @@ module.exports = ->
       R._bare_name_re         = rx.get_rx_for_bare_name         R
       R._paren_name_re        = rx.get_rx_for_paren_name        R
       R._start_paren_name_re  = rx.get_rx_for_start_paren_name  R
-      R._escaped_prefix_re    = /// #{R._escape_esc} #{R._prefix_esc} ///gu
+      R._escaped_prefix_re    = rx.get_rx_for_escaped_prefix    R
+      R._escaped_escape_re    = rx.get_rx_for_escaped_escape    R
+      # R._escaped_prefix_re    = /// #{R._escape_esc} #{R._prefix_esc} ///gu
+      ### prefix, escape must not match chrs.*.forbidden.tail ###
+      ### prefix, escape must be different from each other (can be substrings???) ###
       #.....................................................................................................
       declare.dbm_parameter_list ( x ) ->
         return false unless @isa.list.of.nonempty.text x

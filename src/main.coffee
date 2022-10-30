@@ -191,12 +191,13 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       count++
     #.......................................................................................................
     R.push sqlx[ position ... ] if 0 < position <= sqlx.length
-    # R = R.join '█'
-    R = R.join ''
+    R = if count is 0 then sqlx else  R.join ''
     #.....................................................................................................
     ### NOTE using a function to avoid accidental replacement semantics ###
-    R = sqlx if count is 0
     R = R.replace @cfg._escaped_prefix_re, => @cfg.prefix if level is 0
+    R = R.replaceAll @cfg._escaped_escape_re, ( _..., { esc, } ) =>
+      return if esc.length % 2 is 1 then  @cfg.escape.repeat ( esc.length - 1 ) / 2
+      else                                @cfg.escape.repeat   esc.length       / 2
     return R
 
   #---------------------------------------------------------------------------------------------------------

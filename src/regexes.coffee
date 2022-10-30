@@ -94,3 +94,8 @@ Character (CHR) regexes (RXs) are divided into two modes:
     )
   ///gu
 
+#-----------------------------------------------------------------------------------------------------------
+@get_rx_for_escaped_prefix = ( cfg ) -> /// #{cfg._escape_esc} #{cfg._prefix_esc} ///gu
+@get_rx_for_escaped_escape = ( cfg ) -> /// (?<esc> #{cfg._escape_esc}+ ) ///gu
+
+
