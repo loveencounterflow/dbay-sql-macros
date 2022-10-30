@@ -23,6 +23,7 @@ GUY                       = require 'guy'
 # E                         = require '../../../apps/dbay/lib/errors'
 sql_lexer                 = require 'dbay-sql-lexer'
 rx                        = require './regexes'
+LTSORT                    = require 'ltsort'
 
 
 #-----------------------------------------------------------------------------------------------------------
@@ -43,8 +44,8 @@ class DBay_sqlm_unknown_macro_error       extends DBay_sqlm_error
 class DBay_sqlm_recursion_level_error       extends DBay_sqlm_error
   constructor: ( ref, max_level )   -> super ref, "maximum recursion depth of #{max_level} reached"
 class DBay_sqlm_circular_references_error   extends DBay_sqlm_error
-  constructor: ( ref, names )        -> super ref, \
-    "circular references involving macros #{( rpr n for n from names ).join ', '} detected"
+  constructor: ( ref, name, ref_name ) -> super ref, \
+    "detected circular references in macro #{rpr name}() referencing #{rpr ref_name}()"
 class DBay_sqlm_unknown_parameters_error       extends DBay_sqlm_error
   constructor: ( ref, names )        -> super ref, "unknown parameters #{( rpr n for n from names ).join ', '}"
 class DBay_sqlm_duplicate_parameters_error     extends DBay_sqlm_error
@@ -68,6 +69,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
   constructor: ( cfg ) ->
     GUY.props.hide @, 'types',          ( require './types' )()
     GUY.props.hide @, '_declarations',  {}
+    GUY.props.hide @, '_topograph',     LTSORT.new_graph { loners: true, }
     @cfg = @types.create.dbm_constructor_cfg cfg
     return undefined
 
@@ -105,6 +107,7 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
     if @_declarations[ cfg.name ]?
       throw new DBay_sqlm_TOBESPECIFIED_error '^dbay/dbm@4^', "can not re-declare #{rpr cfg.name}"
     @_validate_parameters cfg.parameters, cfg.body
+    @_validate_cycles cfg.name, cfg.body
     ### TAINT use `@cfg.vanisher` instead of `|` ###
     cfg.parameter_res           = ( rx.get_rx_for_parameter 'practical', '|', p for p in cfg.parameters )
     @_declarations[ cfg.name ]  = cfg
@@ -127,10 +130,21 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
     return null
 
   #---------------------------------------------------------------------------------------------------------
+  _validate_cycles: ( name, body ) ->
+    ref_names = ( body.match @cfg._paren_name_re ) ? []
+    LTSORT.add @_topograph, name
+    for ref_name in ref_names
+      LTSORT.add @_topograph, name, ref_name
+      try dependencies = LTSORT.group @_topograph catch error
+        throw error unless ( error.message.match /detected cycle involving node/ )?
+        throw new DBay_sqlm_circular_references_error '^dbay/dbm@4^', name, ref_name
+    return null
+
+  #---------------------------------------------------------------------------------------------------------
   resolve: ( sqlx ) => @_resolve sqlx, 0, new Set()
 
   #---------------------------------------------------------------------------------------------------------
-  _resolve: ( sqlx, level, seen ) =>
+  _resolve: ( sqlx, level ) =>
     @types.validate.nonempty.text sqlx
     R         = []
     position  = 0
@@ -148,9 +162,6 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       break unless match?
       R.push sqlx[ position ... match.index ]
       name            = match[ 0 ]
-      if seen.has name
-        throw new DBay_sqlm_circular_references_error '^dbay/dbm@4^', seen
-      seen.add name
       #.....................................................................................................
       unless ( declaration = @_declarations[ name ] )?
         throw new DBay_sqlm_unknown_macro_error '^dbay/dbm@5^', name
@@ -170,11 +181,11 @@ class DBay_sqlx # extends ( require H.dbay_path ).DBay
       #.....................................................................................................
       # help '^56-2^', ( rpr tail ), '->', GUY.trm.reverse GUY.trm.steel values
       for value, value_idx in values
-        value = @_resolve value, level + 1, seen if ( value.match pnre )?
+        value = @_resolve value, level + 1 if ( value.match pnre )?
         ### NOTE using a function to avoid accidental replacement semantics ###
         body  = body.replace declaration.parameter_res[ value_idx ], => value
       #.....................................................................................................
-      body      = @_resolve body, level + 1, seen if ( body.match pnre )?
+      body      = @_resolve body, level + 1 if ( body.match pnre )?
       R.push body
       position += stop_idx
       count++
