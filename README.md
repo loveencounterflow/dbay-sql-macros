@@ -125,7 +125,6 @@ create table t (
 # To Do
 
 * **[–]** documentation
-* **[–]** safeguard against using a macro in its own expansion, leads to infinite regress
 * **[–]** should we use a more SQL-ish syntax similar to function declarations like `create macro @m as
   [begin] ... [end];`?
 * **[–]** allow to escape left parens as `\(` in order to ensure that a parameter name does not get confused
@@ -174,5 +173,6 @@ create table t (
 * **[+]** check for undeclared parameters in replacement text
 * **[+]** check for repetitions in parameter declaration
 * **[+]** check for use of non-prefixed parameters in declaration
+* **[+]** safeguard against using a macro in its own expansion, leads to infinite regress
 
 
